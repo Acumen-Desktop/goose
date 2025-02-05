@@ -17,7 +17,7 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onSubmit }: WelcomeScreenProps) {
   return (
-    <div className="h-screen w-full select-none bg-white dark:bg-black">
+    <div className="h-screen w-full select-none bg-grey-20 dark:bg-gray-900">
       {/* Draggable title bar region */}
       <div
         className="relative flex items-center h-[36px] w-full bg-bgSubtle"

@@ -118,7 +118,7 @@
     --text-subtle: var(--grey-50);
 
     &.dark {
-      --background-app: var(--constant-black);
+      --background-app: var(--grey-20);
       --background-prominent: var(--dark-grey-40);
       --background-standard: var(--dark-grey-25);
       --background-subtle: var(--dark-grey-15);
