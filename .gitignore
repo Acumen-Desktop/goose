@@ -35,7 +35,8 @@ debug_*.txt
 
 # Docs
 # Dependencies
-/node_modules
+**/node_modules
+ui-svelte/node_modules
 
 # Production
 /build

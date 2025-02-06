@@ -1,0 +1,1 @@
+"use strict";const t=require("electron"),n={toggleDevTools:()=>t.ipcRenderer.send("toggleDevTools"),setTitleBarColors:(e,o)=>{document.documentElement.style.background=e,t.ipcRenderer.send("setTitleBarColors",e,o)}};for(const[e,o]of Object.entries(n))t.contextBridge.exposeInMainWorld(e,o);
