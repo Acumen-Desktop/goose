@@ -1,0 +1,9 @@
+# documentation structure mcp-wiki markdown
+Goose documentation is organized in multiple locations:
+1. Main docs in /documentation/docs/
+2. Core architecture in project root (ARCHITECTURE.md, etc.)
+3. Example projects in /examples/
+4. Individual crate documentation in /crates/
+5. Documentation index at /acumen/features/goose-docs/existing-md-files.md
+Key focus: MCP Wiki example in /examples/mcp-wiki/ for next session.
+

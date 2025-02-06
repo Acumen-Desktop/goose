@@ -30,6 +30,9 @@ Cargo.lock
 
 debug_*.txt
 
+# Acumen custom development
+/acumen/
+
 # Docs
 # Dependencies
 /node_modules
