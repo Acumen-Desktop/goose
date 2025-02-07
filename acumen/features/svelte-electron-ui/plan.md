@@ -24,5 +24,22 @@ Next steps:
 
   Basic components are in the 'ui' directory. Do not modify the basic components, but instead use them to build compound components.
 
-- The shadcn docs are here:
-  'acumen/features/shadcn-svelte/shad-docs.md'
+#### Phase 2: Chat Interface - Core Components
+
+1. Implement Chat Message Component
+   - Create a new component at 'ui-svelte/src-renderer/lib/components/chat/ChatMessage.svelte'
+   - Use Svelte 5 Runes for state management ($state, $derived as needed)
+   - Utilize shadcn basic components (Button, Card) to match React UI styling
+   - Include the following features:
+     - Display message content (AI or user)
+     - Show timestamp
+     - Support markdown rendering
+     - Basic interaction buttons (copy, etc.)
+   - Write tests to ensure component behavior matches React version
+   - Document component API and usage
+
+This focused approach lets us:
+- Test Svelte 5 Runes in a real component
+- Verify shadcn component integration
+- Establish patterns for future components
+- Compare directly with React implementation
