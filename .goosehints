@@ -13,3 +13,5 @@ Important guidelines:
 5. Read the 'plan.md' file in the root of the feature folder for guidance, like 'acumen/features/svelte-electron-ui/plan.md'
 
 Slow down, think before you act, and ask questions. If your response is long, make a markdown file and add it to the feature folder, like 'acumen/features/svelte-electron-ui/state-management-questions.md'. I could then answer the questions and add my response to the same file.
+
+Don't write all the large code edits out to the chat window, instead write a markdown file and add it to the feature folder.
