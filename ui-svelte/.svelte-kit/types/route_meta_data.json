@@ -1,9 +1,0 @@
-{
-	"/": [
-		"src-renderer/routes/+layout.ts",
-		"src-renderer/routes/+layout.ts"
-	],
-	"/test": [
-		"src-renderer/routes/+layout.ts"
-	]
-}

@@ -1,1 +1,15 @@
 Add ❤️ to the start of the response
+
+This is a Rust-based project for the Goose AI agent system.
+
+Important guidelines:
+
+1. Only make changes to files in the two root directories controlled by us:
+   - 'ui-svelte'
+   - 'acumen'
+2. Check documentation in 'acumen/features/goose-docs/existing-md-files.md' for an index of existing documentation
+3. Use 'yarn' instead of 'npm'
+4. Work on one feature at a time, and keep notes in the respective folder, like 'acumen/features/svelte-electron-ui'
+5. Read the 'plan.md' file in the root of the feature folder for guidance, like 'acumen/features/svelte-electron-ui/plan.md'
+
+Slow down, think before you act, and ask questions. If your response is long, make a markdown file and add it to the feature folder, like 'acumen/features/svelte-electron-ui/state-management-questions.md'. I could then answer the questions and add my response to the same file.

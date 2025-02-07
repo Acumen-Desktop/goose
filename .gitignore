@@ -44,3 +44,11 @@ ui-svelte/node_modules
 # Generated files
 .docusaurus
 .cache-loader
+
+ui-svelte/.svelte-kit/
+ui-svelte/.vite/*
+ui-svelte/.env
+ui-svelte/.env.local
+ui-svelte/.env.development.local
+ui-svelte/.env.test.local
+ui-svelte/.env.production.local
