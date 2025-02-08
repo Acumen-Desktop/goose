@@ -82,20 +82,14 @@ function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     icon: path.join(staticAssetsFolder, "/icon.png"),
-    width: 900,
-    height: 700,
+    x: 2048,
+    y: 0,
+    width: 1800,
+    height: 1000,
     minWidth: 400,
     minHeight: 200,
-    // Window Controls Overlay API - https://developer.mozilla.org/en-US/docs/Web/API/Window_Controls_Overlay_API
-    // Allows for a custom window header while overlaying native window controls in the corner.
-    // https://www.electronjs.org/docs/latest/tutorial/window-customization#window-controls-overlay
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "#374151",
-      symbolColor: "#f8fafc",
-      height: 40,
-    },
     backgroundColor: "#374151",
+    show: false,
     webPreferences: {
       preload: path.join(import.meta.dirname, "../preload/preload.js"),
     },
@@ -109,6 +103,13 @@ function createWindow() {
   } else {
     mainWindow.loadURL("app://-/");
   }
+
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show();
+    if (import.meta.env.DEV) {
+      mainWindow.webContents.openDevTools();
+    }
+  });
 }
 
 // This method will be called when Electron has finished

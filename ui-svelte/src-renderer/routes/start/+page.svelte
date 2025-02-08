@@ -4,7 +4,7 @@
   import typescriptLogo from "$lib/assets/original_images/typescript.svg";
   import viteLogo from "$lib/assets/original_images/vite.svg";
   import tailwindcssLogo from "$lib/assets/original_images/tailwindcss.svg";
-  import Counter from "$lib/Counter.svelte";
+  import Counter from "$lib/components/Counter.svelte";
 </script>
 
 <div class="max-w-7xl mx-auto px-16 py-20">

@@ -2,21 +2,35 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference types="vite/client" />
 
-import type { ExposeInRendererTypes } from './preload.ts';
+import type { ElectronAPI, AppConfigAPI } from "../src-main/types";
+import type * as API from "./types/api";
 
 declare global {
-	// Lets typescript know about exposed preload functions
-	interface Window extends ExposeInRendererTypes {}
+  // Electron API exposed to renderer
+  interface Window {
+    electron: ElectronAPI;
+    appConfig: AppConfigAPI;
+    // Window extensions
+    toggleDevTools: () => void;
+    setTitleBarColors: (
+      backgroundColor: string,
+      foregroundColor: string
+    ) => void;
+  }
 
-	// See https://kit.svelte.dev/docs/types#app
-	// for information about these interfaces
-	namespace App {
-		interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
-	}
+  // Global type exports
+  export type Message = API.Message;
+  export type ToolInvocation = API.ToolInvocation;
+  export type ChatState = API.ChatState;
+
+  // SvelteKit types
+  namespace App {
+    interface Error {}
+    // interface Locals {}
+    // interface PageData {}
+    // interface PageState {}
+    // interface Platform {}
+  }
 }
 
 export {};
