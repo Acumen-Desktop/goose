@@ -3,7 +3,7 @@
 	"style": "default",
 	"tailwind": {
 		"config": "tailwind.config.ts",
-		"css": "src-renderer/app.css",
+		"css": "src-renderer/styles/app.css",
 		"baseColor": "gray"
 	},
 	"aliases": {
