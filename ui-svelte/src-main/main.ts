@@ -83,9 +83,9 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     icon: path.join(staticAssetsFolder, "/icon.png"),
     x: 2048,
-    y: 0,
+    y: 40,
     width: 1800,
-    height: 1000,
+    height: 1060,
     minWidth: 400,
     minHeight: 200,
     backgroundColor: "#374151",
