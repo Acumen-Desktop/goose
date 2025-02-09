@@ -1,42 +1,91 @@
 # Svelte 5 + SvelteKit 2 Migration Notes
 
-## Key Changes
+## ⚠️ CRITICAL CHANGES - READ FIRST
 
-### 1. Svelte 5 Runes
-
-- Use `$state()` instead of `let` for reactive variables
-- Use `$derived()` instead of `$:` for computed values
-- Use `$effect()` for side effects
-- Use `$props()` for component props
-
-### 2. Component Props Pattern
+### Event Handling
 
 ```svelte
-// Old (Svelte 4)
-export let prop;
-
-// New (Svelte 5)
-let { prop } = $props();
-```
-
-### 3. Event Handling
-
-```svelte
-// Old (Svelte 4)
+// ❌ Svelte 4 (Wrong)
 <button on:click={handler}>
+<div on:mouseenter={handler}>
 
-// New (Svelte 5)
+// ✅ Svelte 5 (Correct)
 <button onclick={handler}>
+<div onmouseenter={handler}>
 ```
 
-### 4. shadcn-svelte Integration
+### Content Injection
+
+```svelte
+// ❌ Svelte 4 (Wrong)
+<slot>Default content</slot>
+<slot name="named">Default</slot>
+
+// ✅ Svelte 5 (Correct)
+{@render children?.()}
+{@render actions?.()}
+
+// Props definition
+let {
+  children = () => null,
+  actions = () => null
+} = $props();
+```
+
+### State and Props
+
+```svelte
+// ❌ Svelte 4 (Wrong)
+export let count = 0;
+$: doubled = count * 2;
+
+// ✅ Svelte 5 (Correct)
+let { prop = defaultValue } = $props();
+let count = $state(0);
+let doubled = $derived(count * 2);
+let bindable = $bindable(initialValue);
+```
+
+### Effects
+
+```svelte
+// ❌ Svelte 4 (Wrong)
+$: if (count > 0) console.log(count);
+
+// ✅ Svelte 5 (Correct)
+$effect(() => {
+  if (count > 0) console.log(count);
+});
+```
+
+## Component Props Pattern
+
+```svelte
+let {
+  // Two-way binding
+  isOpen = $bindable(false),
+
+  // Regular props with defaults
+  title = "",
+  class: className = "",
+
+  // Render function props
+  children = () => null,
+  actions = () => null,
+
+  // Rest props
+  ...restProps
+} = $props();
+```
+
+## shadcn-svelte Integration
 
 - Update to latest version: `npx shadcn-svelte@next update`
 - Update bits-ui: `npm i bits-ui@next`
 - Remove cmdk-sv (merged into bits-ui)
 - Update components.json with new registry
 
-### 5. Project Structure
+## Project Structure
 
 ```
 src/
@@ -64,7 +113,7 @@ src/
 
 ## Common Patterns
 
-### 1. State Management
+### State Management
 
 ```svelte
 <script lang="ts">
@@ -77,7 +126,7 @@ src/
 </script>
 ```
 
-### 2. Event Dispatching
+### Event Dispatching
 
 ```svelte
 <script lang="ts">
@@ -87,7 +136,7 @@ src/
 </script>
 ```
 
-### 3. shadcn-svelte Components
+### shadcn-svelte Components
 
 ```svelte
 <script lang="ts">
@@ -124,17 +173,13 @@ src/
    }
    ```
 
-4. Update components to use runes
-
+4. Update components:
    - Convert state to `$state()`
    - Update props to use `$props()`
    - Replace `$:` with `$derived()`
    - Use `$effect()` for side effects
-
-5. Update event handling
-   - Review all event handlers
-   - Update to new syntax where needed
-   - Ensure proper event forwarding
+   - Replace `on:event` with `onevent`
+   - Replace `<slot>` with `{@render}`
 
 ## Common Issues
 
@@ -146,8 +191,8 @@ src/
 
 2. Event Handling
 
-   - Check event forwarding in custom components
-   - Use proper event types from 'svelte/elements'
+   - Use `onclick`, `onmouseenter`, etc.
+   - Use proper event types
    - Handle keyboard events appropriately
 
 3. State Management
@@ -156,10 +201,10 @@ src/
    - Update computed values to `$derived()`
    - Check for proper cleanup in effects
 
-4. shadcn Integration
-   - Verify component imports
-   - Check for proper event forwarding
-   - Update to latest component versions
+4. Content Injection
+   - Replace all slots with render functions
+   - Provide default values `() => null`
+   - Use optional chaining with `{@render prop?.()}`
 
 ## Resources
 

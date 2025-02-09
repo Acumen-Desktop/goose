@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="var(--size, 18)" height="var(--size, 18)" viewBox="0 0 18 18"
+    fill="none">
+    <path d="M9.75 14.25V9.75H14.25V8.25H9.75V3.75H8.25V8.25H3.75V9.75H8.25V14.25H9.75Z" fill="currentColor"
+        fill-opacity="var(--opacity, 0.25)" />
+</svg>

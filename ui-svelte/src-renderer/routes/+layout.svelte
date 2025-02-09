@@ -48,7 +48,7 @@
     <p class="text-lg text-gray-800 dark:text-gray-200 mb-8">{fatalError}</p>
     <button
       class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
-      on:click={() => window.electron.reloadApp()}
+      onclick={() => window.electron.reloadApp()}
     >
       Reload Application
     </button>

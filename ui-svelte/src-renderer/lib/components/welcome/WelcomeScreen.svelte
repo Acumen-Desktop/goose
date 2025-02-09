@@ -81,7 +81,7 @@
             onclick={() => handleProviderSelect(provider.id)}
             onkeydown={(e) => handleKeydown(e, provider.id)}
             role="button"
-            tabindex="0"
+            tabindex={0}
           >
             <CardContent class="p-6">
               <div class="flex items-start gap-4">

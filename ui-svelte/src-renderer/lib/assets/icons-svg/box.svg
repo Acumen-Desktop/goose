@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 15" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="var(--size, 14)" height="var(--size, 14)" viewBox="0 0 14 14"
+    fill="none">
     <path
         d="M1 4.35L7 1.25L13 4.35M1 4.35L7 7.25M1 4.35V10.75L7 13.75M13 4.35L7 7.25M13 4.35V10.75L7 13.75M7 7.25V13.75"
         stroke="url(#paint0_linear_113_4015)" stroke-width="2" stroke-linecap="round" />
