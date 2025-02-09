@@ -71,7 +71,9 @@
     // Retry every 5 seconds if not connected
     const interval = setInterval(() => {
       if (!serverStatus.includes("Connected")) {
-        console.log("Retrying server connection...");
+        window.logInfo(
+          `[Server] Attempting to reconnect... (Attempt ${debugInfo.connectionAttempts + 1})`
+        );
         void checkServer();
       }
     }, 5000);

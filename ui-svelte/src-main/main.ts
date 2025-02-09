@@ -8,32 +8,212 @@ process.stderr.on("error", (err) => {
   throw err;
 });
 
-import { app, BrowserWindow, ipcMain, protocol, net } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  protocol,
+  net,
+  Tray,
+  Menu,
+  globalShortcut,
+} from "electron";
 import path from "path";
 import url from "url";
 import { stat } from "node:fs/promises";
 import { startGoosed } from "./goosed";
 import log from "./utils/logger";
+import { loadRecentDirs, addRecentDir } from "./utils/recentDirs";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 import electronSquirrelStartup from "electron-squirrel-startup";
 if (electronSquirrelStartup) app.quit();
 
-// Only one instance of the electron main process should be running due to how chromium works.
-// If another instance of the main process is already running `app.requestSingleInstanceLock()`
-// will return false, `app.quit()` will be called, and the other instances will receive a
-// 'second-instance' event.
-// https://www.electronjs.org/docs/latest/api/app#apprequestsingleinstancelockadditionaldata
+// Only one instance allowed
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
 
-// This event will be called when a second instance of the app tries to run.
-// https://www.electronjs.org/docs/latest/api/app#event-second-instance
-app.on("second-instance", (event, args, workingDirectory, additionalData) => {
-  createWindow();
-});
+// Window counter for positioning
+let windowCounter = 0;
 
+// Create tray icon
+function createTray() {
+  const isDev = import.meta.env.DEV;
+  const iconPath = path.join(staticAssetsFolder, "iconTemplate.png");
+  const tray = new Tray(iconPath);
+
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "Show Window", click: showWindow },
+    { type: "separator" },
+    { label: "Quit", click: () => app.quit() },
+  ]);
+
+  tray.setToolTip("Goose");
+  tray.setContextMenu(contextMenu);
+  return tray;
+}
+
+// Show/focus window
+function showWindow() {
+  const windows = BrowserWindow.getAllWindows();
+  if (windows.length === 0) {
+    log.info("No windows are currently open.");
+    return;
+  }
+
+  const initialOffsetX = 30;
+  const initialOffsetY = 30;
+
+  windows.forEach((win, index) => {
+    const currentBounds = win.getBounds();
+    win.setBounds({
+      x: currentBounds.x + initialOffsetX * index,
+      y: currentBounds.y + initialOffsetY * index,
+      width: currentBounds.width,
+      height: currentBounds.height,
+    });
+
+    if (!win.isVisible()) {
+      win.show();
+    }
+    win.focus();
+  });
+}
+
+// Create launcher window
+async function createLauncher() {
+  const launcherWindow = new BrowserWindow({
+    width: 600,
+    height: 60,
+    frame: false,
+    transparent: false,
+    webPreferences: {
+      preload: path.join(app.getAppPath(), ".vite/main/preload.cjs"),
+      additionalArguments: [JSON.stringify({ type: "launcher" })],
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+    },
+    skipTaskbar: true,
+    alwaysOnTop: true,
+  });
+
+  // Center on screen
+  const { screen } = require("electron");
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+  const windowBounds = launcherWindow.getBounds();
+
+  launcherWindow.setPosition(
+    Math.round(width / 2 - windowBounds.width / 2),
+    Math.round(height / 3 - windowBounds.height / 2)
+  );
+
+  // Load launcher window content
+  if (import.meta.env.DEV) {
+    await launcherWindow.loadURL(
+      `${VITE_DEV_SERVER_URLS["main_window"]}?window=launcher`
+    );
+  } else {
+    await launcherWindow.loadURL("app://-/?window=launcher");
+  }
+
+  // Destroy window when it loses focus
+  launcherWindow.on("blur", () => {
+    launcherWindow.destroy();
+  });
+}
+
+// Create chat window
+async function createChat(query?: string, dir?: string, version?: string) {
+  // Start the Goose server first
+  let port, working_dir;
+  try {
+    [port, working_dir] = await startGoosed(app, dir);
+    log.info(
+      `Goose server started on port ${port} in directory ${working_dir}`
+    );
+  } catch (error) {
+    log.error("Failed to start Goose server:", error);
+    app.quit();
+    return;
+  }
+
+  // Window configuration
+  const mainWindow = new BrowserWindow({
+    titleBarStyle: "hidden",
+    trafficLightPosition: { x: 16, y: 10 },
+    vibrancy: "window",
+    width: 750,
+    height: 800,
+    minWidth: 650,
+    backgroundColor: "#374151",
+    icon: path.join(staticAssetsFolder, "icon.png"),
+    webPreferences: {
+      preload: path.join(app.getAppPath(), ".vite/main/preload.cjs"),
+      additionalArguments: [
+        JSON.stringify({
+          type: "chat",
+          GOOSE_PORT: port,
+          GOOSE_WORKING_DIR: working_dir,
+          GOOSE_API_HOST: "http://127.0.0.1",
+          REQUEST_DIR: dir,
+          secretKey: "dev-key",
+        }),
+      ],
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+    },
+  });
+
+  // Increment window counter and position window
+  const { screen } = require("electron");
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width } = primaryDisplay.workAreaSize;
+
+  windowCounter++;
+  const direction = windowCounter % 2 === 0 ? 1 : -1;
+  const initialOffset = 50;
+  const baseXPosition = Math.round(width / 2 - mainWindow.getSize()[0] / 2);
+  const xOffset = direction * initialOffset * Math.floor(windowCounter / 2);
+  mainWindow.setPosition(baseXPosition + xOffset, 100);
+
+  // Load content with query params
+  const queryParam = query ? `?initialQuery=${encodeURIComponent(query)}` : "";
+  if (import.meta.env.DEV) {
+    await mainWindow.loadURL(
+      `${VITE_DEV_SERVER_URLS["main_window"]}${queryParam}`
+    );
+  } else {
+    await mainWindow.loadURL(`app://-/${queryParam}`);
+  }
+
+  // Show window when ready
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show();
+    if (import.meta.env.DEV) {
+      mainWindow.webContents.openDevTools();
+    }
+  });
+
+  // Log any window errors
+  mainWindow.webContents.on(
+    "did-fail-load",
+    (event, errorCode, errorDescription) => {
+      log.error("Window failed to load:", errorCode, errorDescription);
+    }
+  );
+
+  mainWindow.webContents.on("console-message", (event, level, message) => {
+    log.info("Renderer Console:", message);
+  });
+
+  return mainWindow;
+}
+
+// Protocol registration
 const scheme = "app";
 const srcFolder = path.join(app.getAppPath(), `.vite/main_window/`);
 const staticAssetsFolder = import.meta.env.DEV
@@ -80,94 +260,37 @@ app.on("ready", () => {
   });
 });
 
-async function createWindow() {
-  // Start the Goose server first
-  let port, working_dir;
-  try {
-    [port, working_dir] = await startGoosed(app);
-    log.info(
-      `Goose server started on port ${port} in directory ${working_dir}`
-    );
-  } catch (error) {
-    log.error("Failed to start Goose server:", error);
-    app.quit();
-    return;
-  }
+// App initialization
+app.whenReady().then(async () => {
+  // Create tray and initial window
+  createTray();
+  const recentDirs = loadRecentDirs();
+  let openDir = recentDirs.length > 0 ? recentDirs[0] : undefined;
+  await createChat(undefined, openDir);
 
-  // Always use the built CJS file for preload
-  const preloadPath = path.join(app.getAppPath(), ".vite/main/preload.cjs");
-  log.info("Creating window with preload script:", preloadPath);
-  log.info("Current directory:", process.cwd());
-  log.info("import.meta.dirname:", import.meta.dirname);
+  // Register global shortcuts
+  globalShortcut.register("Control+Alt+Command+G", createLauncher);
 
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    icon: path.join(staticAssetsFolder, "/icon.png"),
-    x: 2048,
-    y: 40,
-    width: 1800,
-    height: 1060,
-    minWidth: 400,
-    minHeight: 200,
-    backgroundColor: "#374151",
-    show: false,
-    webPreferences: {
-      preload: preloadPath,
-      additionalArguments: [
-        JSON.stringify({
-          GOOSE_PORT: port,
-          GOOSE_WORKING_DIR: working_dir,
-          GOOSE_API_HOST: "http://127.0.0.1",
-          secretKey: "dev-key",
-        }),
-      ],
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: false, // Required for preload scripts in some cases
-    },
+  // Handle IPC events
+  ipcMain.on("create-chat-window", (_, query, dir, version) => {
+    createChat(query, dir, version);
   });
 
-  // Log window creation
-  log.info("Window created, loading content...");
-
-  if (import.meta.env.DEV) {
-    log.info("Loading dev server URL:", VITE_DEV_SERVER_URLS["main_window"]);
-    mainWindow.loadURL(VITE_DEV_SERVER_URLS["main_window"]);
-  } else {
-    log.info("Loading production URL: app://-/");
-    mainWindow.loadURL("app://-/");
-  }
-
-  mainWindow.on("ready-to-show", () => {
-    log.info("Window ready to show");
-    mainWindow.show();
-    if (import.meta.env.DEV) {
-      log.info("Opening DevTools in dev mode");
-      mainWindow.webContents.openDevTools();
-    }
+  ipcMain.on("directory-chooser", (_, replace: boolean = false) => {
+    // TODO: Implement directory chooser
   });
 
-  // Log any window errors
-  mainWindow.webContents.on(
-    "did-fail-load",
-    (event, errorCode, errorDescription) => {
-      log.error("Window failed to load:", errorCode, errorDescription);
-    }
-  );
-
-  mainWindow.webContents.on("console-message", (event, level, message) => {
-    log.info("Renderer Console:", message);
+  ipcMain.on("logInfo", (_, info) => {
+    log.info("from renderer:", info);
   });
-}
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+  ipcMain.on("reload-app", () => {
+    app.relaunch();
+    app.exit(0);
+  });
+});
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Window management
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
@@ -175,22 +298,17 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    createChat();
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
+// IPC handlers
 ipcMain.on("toggleDevTools", (event) => event.sender.toggleDevTools());
 ipcMain.on("setTitleBarColors", (event, bgColor, iconColor) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   if (window === null) return;
 
-  // MacOS title bar overlay buttons do not need styling so the function is undefined
   if (window.setTitleBarOverlay === undefined) return;
 
   window.setTitleBarOverlay({
