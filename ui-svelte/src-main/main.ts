@@ -1,9 +1,9 @@
-// Add error handlers for EIO errors on stdout and stderr
-process.stdout.on("error", (err) => {
+// Error handlers for EIO errors
+process.stdout.on("error", (err: NodeJS.ErrnoException) => {
   if (err.code === "EIO") return;
   throw err;
 });
-process.stderr.on("error", (err) => {
+process.stderr.on("error", (err: NodeJS.ErrnoException) => {
   if (err.code === "EIO") return;
   throw err;
 });
@@ -17,29 +17,43 @@ import {
   Tray,
   Menu,
   globalShortcut,
+  screen,
 } from "electron";
 import path from "path";
 import url from "url";
 import { stat } from "node:fs/promises";
+import electronSquirrelStartup from "electron-squirrel-startup";
 import { startGoosed } from "./goosed";
 import log from "./utils/logger";
-import { loadRecentDirs, addRecentDir } from "./utils/recentDirs";
+import { loadRecentDirs } from "./utils/recentDirs";
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-import electronSquirrelStartup from "electron-squirrel-startup";
-if (electronSquirrelStartup) app.quit();
+import type { WindowType, IpcEvents } from './types/ipc';
+import type { GooseProcess, GooseResult } from './types/process';
 
-// Only one instance allowed
-if (!app.requestSingleInstanceLock()) {
+// Prevent multiple instances
+if (!app.requestSingleInstanceLock() || electronSquirrelStartup) {
   app.quit();
 }
 
-// Window counter for positioning
+// Constants
+const scheme = "app";
+const srcFolder = path.join(app.getAppPath(), `.vite/main_window/`);
+const staticAssetsFolder = import.meta.env.DEV
+  ? path.join(import.meta.dirname, "../../static/")
+  : srcFolder;
+
+// Helper functions
+async function isFile(filePath: string): Promise<string | undefined> {
+  try {
+    if ((await stat(filePath)).isFile()) return filePath;
+  } catch (e) {
+    return undefined;
+  }
+}
+
 let windowCounter = 0;
 
-// Create tray icon
-function createTray() {
-  const isDev = import.meta.env.DEV;
+function createTray(): Tray {
   const iconPath = path.join(staticAssetsFolder, "iconTemplate.png");
   const tray = new Tray(iconPath);
 
@@ -54,8 +68,7 @@ function createTray() {
   return tray;
 }
 
-// Show/focus window
-function showWindow() {
+function showWindow(): void {
   const windows = BrowserWindow.getAllWindows();
   if (windows.length === 0) {
     log.info("No windows are currently open.");
@@ -74,15 +87,12 @@ function showWindow() {
       height: currentBounds.height,
     });
 
-    if (!win.isVisible()) {
-      win.show();
-    }
+    if (!win.isVisible()) win.show();
     win.focus();
   });
 }
 
-// Create launcher window
-async function createLauncher() {
+async function createLauncher(): Promise<void> {
   const launcherWindow = new BrowserWindow({
     width: 600,
     height: 60,
@@ -90,7 +100,7 @@ async function createLauncher() {
     transparent: false,
     webPreferences: {
       preload: path.join(app.getAppPath(), ".vite/main/preload.cjs"),
-      additionalArguments: [JSON.stringify({ type: "launcher" })],
+      additionalArguments: [JSON.stringify({ type: "launcher" } satisfies WindowType)],
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
@@ -99,8 +109,6 @@ async function createLauncher() {
     alwaysOnTop: true,
   });
 
-  // Center on screen
-  const { screen } = require("electron");
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
   const windowBounds = launcherWindow.getBounds();
@@ -110,7 +118,6 @@ async function createLauncher() {
     Math.round(height / 3 - windowBounds.height / 2)
   );
 
-  // Load launcher window content
   if (import.meta.env.DEV) {
     await launcherWindow.loadURL(
       `${VITE_DEV_SERVER_URLS["main_window"]}?window=launcher`
@@ -119,110 +126,88 @@ async function createLauncher() {
     await launcherWindow.loadURL("app://-/?window=launcher");
   }
 
-  // Destroy window when it loses focus
   launcherWindow.on("blur", () => {
     launcherWindow.destroy();
   });
 }
 
-// Create chat window
-async function createChat(query?: string, dir?: string, version?: string) {
-  // Start the Goose server first
-  let port, working_dir;
+async function createChat(query?: string, dir?: string, version?: string): Promise<BrowserWindow> {
   try {
-    [port, working_dir] = await startGoosed(app, dir);
-    log.info(
-      `Goose server started on port ${port} in directory ${working_dir}`
-    );
+    const [port, working_dir] = await startGoosed(app, dir);
+    log.info(`Goose server started on port ${port} in directory ${working_dir}`);
+
+    const mainWindow = new BrowserWindow({
+      titleBarStyle: "hidden",
+      trafficLightPosition: { x: 16, y: 10 },
+      vibrancy: "window",
+      width: 750,
+      height: 800,
+      minWidth: 650,
+      backgroundColor: "#374151",
+      icon: path.join(staticAssetsFolder, "icon.png"),
+      webPreferences: {
+        preload: path.join(app.getAppPath(), ".vite/main/preload.cjs"),
+        additionalArguments: [
+          JSON.stringify({
+            type: "chat",
+            GOOSE_PORT: port,
+            GOOSE_WORKING_DIR: working_dir,
+            GOOSE_API_HOST: "http://127.0.0.1",
+            REQUEST_DIR: dir,
+            secretKey: "dev-key",
+          } satisfies WindowType),
+        ],
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: false,
+      },
+    });
+
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width } = primaryDisplay.workAreaSize;
+    windowCounter++;
+    const direction = windowCounter % 2 === 0 ? 1 : -1;
+    const initialOffset = 50;
+    const baseXPosition = Math.round(width / 2 - mainWindow.getSize()[0] / 2);
+    const xOffset = direction * initialOffset * Math.floor(windowCounter / 2);
+    mainWindow.setPosition(baseXPosition + xOffset, 100);
+
+    const queryParam = query ? `?initialQuery=${encodeURIComponent(query)}` : "";
+    if (import.meta.env.DEV) {
+      await mainWindow.loadURL(
+        `${VITE_DEV_SERVER_URLS["main_window"]}${queryParam}`
+      );
+    } else {
+      await mainWindow.loadURL(`app://-/${queryParam}`);
+    }
+
+    mainWindow.on("ready-to-show", () => {
+      mainWindow.show();
+      if (import.meta.env.DEV) {
+        mainWindow.webContents.openDevTools();
+      }
+    });
+
+    mainWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription) => {
+      log.error("Window failed to load:", errorCode, errorDescription);
+    });
+
+    mainWindow.webContents.on("console-message", (event, level, message) => {
+      log.info("Renderer Console:", message);
+    });
+
+    return mainWindow;
   } catch (error) {
     log.error("Failed to start Goose server:", error);
     app.quit();
-    return;
+    throw error;
   }
-
-  // Window configuration
-  const mainWindow = new BrowserWindow({
-    titleBarStyle: "hidden",
-    trafficLightPosition: { x: 16, y: 10 },
-    vibrancy: "window",
-    width: 750,
-    height: 800,
-    minWidth: 650,
-    backgroundColor: "#374151",
-    icon: path.join(staticAssetsFolder, "icon.png"),
-    webPreferences: {
-      preload: path.join(app.getAppPath(), ".vite/main/preload.cjs"),
-      additionalArguments: [
-        JSON.stringify({
-          type: "chat",
-          GOOSE_PORT: port,
-          GOOSE_WORKING_DIR: working_dir,
-          GOOSE_API_HOST: "http://127.0.0.1",
-          REQUEST_DIR: dir,
-          secretKey: "dev-key",
-        }),
-      ],
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: false,
-    },
-  });
-
-  // Increment window counter and position window
-  const { screen } = require("electron");
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const { width } = primaryDisplay.workAreaSize;
-
-  windowCounter++;
-  const direction = windowCounter % 2 === 0 ? 1 : -1;
-  const initialOffset = 50;
-  const baseXPosition = Math.round(width / 2 - mainWindow.getSize()[0] / 2);
-  const xOffset = direction * initialOffset * Math.floor(windowCounter / 2);
-  mainWindow.setPosition(baseXPosition + xOffset, 100);
-
-  // Load content with query params
-  const queryParam = query ? `?initialQuery=${encodeURIComponent(query)}` : "";
-  if (import.meta.env.DEV) {
-    await mainWindow.loadURL(
-      `${VITE_DEV_SERVER_URLS["main_window"]}${queryParam}`
-    );
-  } else {
-    await mainWindow.loadURL(`app://-/${queryParam}`);
-  }
-
-  // Show window when ready
-  mainWindow.on("ready-to-show", () => {
-    mainWindow.show();
-    if (import.meta.env.DEV) {
-      mainWindow.webContents.openDevTools();
-    }
-  });
-
-  // Log any window errors
-  mainWindow.webContents.on(
-    "did-fail-load",
-    (event, errorCode, errorDescription) => {
-      log.error("Window failed to load:", errorCode, errorDescription);
-    }
-  );
-
-  mainWindow.webContents.on("console-message", (event, level, message) => {
-    log.info("Renderer Console:", message);
-  });
-
-  return mainWindow;
 }
 
 // Protocol registration
-const scheme = "app";
-const srcFolder = path.join(app.getAppPath(), `.vite/main_window/`);
-const staticAssetsFolder = import.meta.env.DEV
-  ? path.join(import.meta.dirname, "../../static/")
-  : srcFolder;
-
 protocol.registerSchemesAsPrivileged([
   {
-    scheme: scheme,
+    scheme,
     privileges: {
       standard: true,
       secure: true,
@@ -239,12 +224,6 @@ app.on("ready", () => {
       decodeURIComponent(new URL(request.url).pathname)
     );
 
-    async function isFile(filePath: string) {
-      try {
-        if ((await stat(filePath)).isFile()) return filePath;
-      } catch (e) {}
-    }
-
     const responseFilePath =
       (await isFile(path.join(srcFolder, requestPath))) ??
       (await isFile(
@@ -256,38 +235,36 @@ app.on("ready", () => {
       )) ??
       path.join(srcFolder, "200.html");
 
-    return await net.fetch(url.pathToFileURL(responseFilePath).toString());
+    return net.fetch(url.pathToFileURL(responseFilePath).toString());
   });
 });
 
 // App initialization
 app.whenReady().then(async () => {
-  // Create tray and initial window
   createTray();
   const recentDirs = loadRecentDirs();
-  let openDir = recentDirs.length > 0 ? recentDirs[0] : undefined;
+  const openDir = recentDirs.length > 0 ? recentDirs[0] : undefined;
   await createChat(undefined, openDir);
 
-  // Register global shortcuts
   globalShortcut.register("Control+Alt+Command+G", createLauncher);
 
-  // Handle IPC events
-  ipcMain.on("create-chat-window", (_, query, dir, version) => {
+  // Type-safe IPC event handlers
+  ipcMain.on('create-chat-window', ((_, query, dir, version) => {
     createChat(query, dir, version);
-  });
+  }) as IpcEvents['create-chat-window']);
 
-  ipcMain.on("directory-chooser", (_, replace: boolean = false) => {
+  ipcMain.on('directory-chooser', ((_, replace = false) => {
     // TODO: Implement directory chooser
-  });
+  }) as IpcEvents['directory-chooser']);
 
-  ipcMain.on("logInfo", (_, info) => {
+  ipcMain.on('logInfo', ((_, info) => {
     log.info("from renderer:", info);
-  });
+  }) as IpcEvents['logInfo']);
 
-  ipcMain.on("reload-app", () => {
+  ipcMain.on('reload-app', (() => {
     app.relaunch();
     app.exit(0);
-  });
+  }) as IpcEvents['reload-app']);
 });
 
 // Window management
@@ -304,16 +281,14 @@ app.on("activate", () => {
 });
 
 // IPC handlers
-ipcMain.on("toggleDevTools", (event) => event.sender.toggleDevTools());
-ipcMain.on("setTitleBarColors", (event, bgColor, iconColor) => {
+ipcMain.on('toggleDevTools', ((event) => event.sender.toggleDevTools()) as IpcEvents['toggleDevTools']);
+ipcMain.on('setTitleBarColors', ((event, bgColor, iconColor) => {
   const window = BrowserWindow.fromWebContents(event.sender);
-  if (window === null) return;
-
-  if (window.setTitleBarOverlay === undefined) return;
+  if (!window?.setTitleBarOverlay) return;
 
   window.setTitleBarOverlay({
     color: bgColor,
     symbolColor: iconColor,
     height: 40,
   });
-});
+}) as IpcEvents['setTitleBarColors']);
