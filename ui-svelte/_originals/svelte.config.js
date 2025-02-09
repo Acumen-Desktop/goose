@@ -15,12 +15,9 @@ const config = {
     },
 
     paths: {
-      base: "",
       relative: false,
-      assets: "",
     },
 
-    appDir: "app",
     files: {
       assets: "static",
       lib: "src-renderer/lib",
@@ -31,21 +28,16 @@ const config = {
       errorTemplate: "src-renderer/error.html",
     },
 
-    alias: {
-      $lib: "src-renderer/lib",
-    },
-
     // adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
     // If your environment is not supported, or you settled on a specific environment, switch out the adapter.
     // See https://kit.svelte.dev/docs/adapters for more information about adapters.
     adapter: adapter({
       // SPA (Single-page application)
       // https://kit.svelte.dev/docs/single-page-apps
-      fallback: "index.html",
-      strict: false,
+      fallback: "200.html",
+
       pages: ".vite/main_window",
       assets: ".vite/main_window",
-      precompress: false,
     }),
   },
 };

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan outlines the strategy for creating a Svelte-based UI for Goose while maintaining the ability to pull updates from upstream. The goal is to create a parallel UI implementation that doesn't interfere with the original React-based implementation.
+This plan outlines the strategy for creating a Svelte-based UI for 'Goose AI', while maintaining the ability to pull updates from upstream. The goal is to create a parallel UI implementation that doesn't interfere with the original React-based implementation.
 
 ## Key Principles
 

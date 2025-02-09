@@ -16,6 +16,7 @@ declare global {
       backgroundColor: string,
       foregroundColor: string
     ) => void;
+    logInfo: (txt: string) => void;
   }
 
   // Global type exports
@@ -25,7 +26,7 @@ declare global {
 
   // SvelteKit types
   namespace App {
-    interface Error {}
+    // interface Error {}
     // interface Locals {}
     // interface PageData {}
     // interface PageState {}

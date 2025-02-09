@@ -12,6 +12,8 @@ import { app, BrowserWindow, ipcMain, protocol, net } from "electron";
 import path from "path";
 import url from "url";
 import { stat } from "node:fs/promises";
+import { startGoosed } from "./goosed";
+import log from "./utils/logger";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 import electronSquirrelStartup from "electron-squirrel-startup";
@@ -78,7 +80,26 @@ app.on("ready", () => {
   });
 });
 
-function createWindow() {
+async function createWindow() {
+  // Start the Goose server first
+  let port, working_dir;
+  try {
+    [port, working_dir] = await startGoosed(app);
+    log.info(
+      `Goose server started on port ${port} in directory ${working_dir}`
+    );
+  } catch (error) {
+    log.error("Failed to start Goose server:", error);
+    app.quit();
+    return;
+  }
+
+  // Always use the built CJS file for preload
+  const preloadPath = path.join(app.getAppPath(), ".vite/main/preload.cjs");
+  log.info("Creating window with preload script:", preloadPath);
+  log.info("Current directory:", process.cwd());
+  log.info("import.meta.dirname:", import.meta.dirname);
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     icon: path.join(staticAssetsFolder, "/icon.png"),
@@ -91,24 +112,51 @@ function createWindow() {
     backgroundColor: "#374151",
     show: false,
     webPreferences: {
-      preload: path.join(import.meta.dirname, "../preload/preload.js"),
+      preload: preloadPath,
+      additionalArguments: [
+        JSON.stringify({
+          GOOSE_PORT: port,
+          GOOSE_WORKING_DIR: working_dir,
+          GOOSE_API_HOST: "http://127.0.0.1",
+          secretKey: "dev-key",
+        }),
+      ],
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false, // Required for preload scripts in some cases
     },
   });
 
-  if (import.meta.env.DEV) {
-    mainWindow.loadURL(VITE_DEV_SERVER_URLS["main_window"]);
+  // Log window creation
+  log.info("Window created, loading content...");
 
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+  if (import.meta.env.DEV) {
+    log.info("Loading dev server URL:", VITE_DEV_SERVER_URLS["main_window"]);
+    mainWindow.loadURL(VITE_DEV_SERVER_URLS["main_window"]);
   } else {
+    log.info("Loading production URL: app://-/");
     mainWindow.loadURL("app://-/");
   }
 
   mainWindow.on("ready-to-show", () => {
+    log.info("Window ready to show");
     mainWindow.show();
     if (import.meta.env.DEV) {
+      log.info("Opening DevTools in dev mode");
       mainWindow.webContents.openDevTools();
     }
+  });
+
+  // Log any window errors
+  mainWindow.webContents.on(
+    "did-fail-load",
+    (event, errorCode, errorDescription) => {
+      log.error("Window failed to load:", errorCode, errorDescription);
+    }
+  );
+
+  mainWindow.webContents.on("console-message", (event, level, message) => {
+    log.info("Renderer Console:", message);
   });
 }
 

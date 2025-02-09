@@ -3,7 +3,7 @@ import { builtinModules } from "node:module";
 
 export default defineConfig({
   build: {
-    outDir: ".vite/main",
+    outDir: ".vite/preload",
     minify: "esbuild",
     rollupOptions: {
       external: [
@@ -14,14 +14,14 @@ export default defineConfig({
       // Also `build.rollupOptions.input` allows for multiple entry points.
       // https://rollupjs.org/configuration-options/#input
       input: {
-        preload: "./src-main/preload.ts",
+        preload: "./src-renderer/preload.ts",
       },
       output: {
-        format: "cjs",
+        format: "commonjs",
         // It should not be split chunks.
         inlineDynamicImports: true,
-        entryFileNames: "[name].cjs",
-        chunkFileNames: "[name].cjs",
+        entryFileNames: "[name].js",
+        chunkFileNames: "[name].js",
         assetFileNames: "[name].[ext]",
       },
     },

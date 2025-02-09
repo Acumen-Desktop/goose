@@ -1,5 +1,5 @@
 import { getApiUrl, getSecretKey } from "../config";
-import { loadAndAddStoredExtensions } from "../extensions";
+import { loadAndAddStoredExtensions } from "../../src-renderer/lib/extensions";
 import { GOOSE_PROVIDER } from "../env_vars";
 import type { Model } from "../components/settings/models/ModelContext";
 
@@ -81,7 +81,7 @@ export const initializeSystem = async (provider: string, model: string) => {
     console.log("initializing agent with provider", provider, "model", model);
     await addAgent(provider.toLowerCase().replace(/ /g, "_"), model);
 
-    loadAndAddStoredExtensions().catch((error) => {
+    loadAndAddStoredExtensions().catch((error: Error) => {
       console.error("Failed to load and add stored extension configs:", error);
     });
   } catch (error) {

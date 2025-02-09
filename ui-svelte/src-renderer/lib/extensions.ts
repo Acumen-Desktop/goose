@@ -1,5 +1,6 @@
-import { getApiUrl, getSecretKey } from "./config";
+import { getApiUrl, getSecretKey } from "../../src-main/config";
 import { toast } from "svelte-sonner";
+import type { IpcRendererEvent } from "electron";
 
 // ExtensionConfig type matching the Rust version
 export type ExtensionConfig =
@@ -208,7 +209,7 @@ function storeExtensionConfig(config: FullExtensionConfig) {
       localStorage.setItem("user_settings", JSON.stringify(userSettings));
       console.log("Extension config stored successfully in user_settings");
       // Notify settings update through electron IPC
-      window.electron.on("settings-updated", (event) => {
+      window.electron.on("settings-updated", (event: IpcRendererEvent) => {
         console.log("Settings updated", event);
       });
     } else {
