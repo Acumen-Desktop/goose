@@ -9,18 +9,8 @@
   };
 </script>
 
-<div class="h-screen w-full select-none bg-background">
-  <!-- Draggable title bar region -->
-  <div
-    class="relative flex items-center h-[36px] w-full bg-muted"
-    style="-webkit-app-region: drag"
-  ></div>
-
-  <!-- Content area - explicitly set as non-draggable -->
-  <div
-    class="h-[calc(100vh-36px)] w-full overflow-hidden"
-    style="--webkit-app-region: no-drag"
-  >
+<div class="size-full select-none bg-background">
+  <div class="size-full overflow-hidden">
     <ScrollArea class="h-full w-full">
       <div
         class="flex min-h-full flex-col justify-center px-8 py-8 md:px-16 max-w-4xl mx-auto"

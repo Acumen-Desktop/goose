@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [sveltekit()],
   clearScreen: false,
   css: {
-    postcss: "./postcss.config.js",
+    postcss: "./postcss.config.cjs",
   },
   build: {
     outDir: ".vite/main_window",

@@ -62,43 +62,28 @@
   });
 </script>
 
-<div class="flex flex-col h-screen bg-background text-foreground">
-  <!-- Titlebar -->
-  <div
-    id="titlebar"
-    class="h-8 bg-muted flex items-center justify-between px-4"
-    style="-webkit-app-region: drag"
-  >
-    <div class="flex items-center gap-2">
-      <GooseLogo size="small" hover={false} />
-      <span class="text-sm font-medium">Goose</span>
-    </div>
+<main
+  class="h-screen bg-background text-foreground flex flex-col items-center justify-center gap-8 p-8"
+>
+  <div class="relative">
+    <GooseLogo size="default" class="w-32 h-32" />
+    {#if isLoading}
+      <div class="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
+        <Progress value={progress} class="w-48" />
+      </div>
+    {/if}
   </div>
 
-  <!-- Main Content -->
-  <main class="flex-1 overflow-hidden">
-    <div class="flex flex-col items-center justify-center h-full gap-8 p-8">
-      <div class="relative">
-        <GooseLogo size="default" class="w-32 h-32" />
-        {#if isLoading}
-          <div class="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
-            <Progress value={progress} class="w-48" />
-          </div>
-        {/if}
+  <div class="text-center space-y-4">
+    {#if error}
+      <p class="text-destructive">{error}</p>
+    {:else if isLoading}
+      <p class="text-muted-foreground">Starting Goose server...</p>
+    {:else if serverStarted}
+      <div class="space-y-2">
+        <p class="text-green-500">Server started successfully!</p>
+        <Button onclick={() => goto("/welcome")}>Continue</Button>
       </div>
-
-      <div class="text-center space-y-4">
-        {#if error}
-          <p class="text-destructive">{error}</p>
-        {:else if isLoading}
-          <p class="text-muted-foreground">Starting Goose server...</p>
-        {:else if serverStarted}
-          <div class="space-y-2">
-            <p class="text-green-500">Server started successfully!</p>
-            <Button onclick={() => goto("/welcome")}>Continue</Button>
-          </div>
-        {/if}
-      </div>
-    </div>
-  </main>
-</div>
+    {/if}
+  </div>
+</main>

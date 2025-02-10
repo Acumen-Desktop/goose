@@ -1,7 +1,6 @@
 <!-- Main App Layout -->
 <script lang="ts">
   import { onMount } from "svelte";
-  import { preferredTheme } from "$lib/preferredTheme.svelte";
   import { Toaster } from "svelte-sonner";
   import "$lib/styles/app.css";
   import { ModeWatcher } from "mode-watcher";
@@ -27,15 +26,6 @@
       window.electron.off("fatal-error", handleFatalError);
     };
   });
-
-  // Set titlebar colors based on theme
-  $effect(() => {
-    // if (preferredTheme.theme === "dark") {
-    //   window.setTitleBarColors("#374151", "#f8fafc");
-    // } else {
-    //   window.setTitleBarColors("#e5e7eb", "#020617");
-    // }
-  });
 </script>
 
 {#if fatalError}
@@ -54,22 +44,8 @@
     </button>
   </div>
 {:else}
-  <!-- Titlebar -->
   <div
-    id="titlebar"
-    class="shrink-0 bg-gradient-to-r from-gray-100 to-gray-200 flex text-slate-950 dark:from-[#273141] dark:to-gray-700 dark:text-slate-50"
-  >
-    <div
-      class="px-4 select-none grow text-xs flex items-center"
-      style="-webkit-app-region: drag;"
-    >
-      Goose AI
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div
-    class="overflow-auto h-full bg-gradient-to-br from-white to-zinc-50 text-slate-950 dark:from-zinc-800 dark:to-zinc-900 dark:text-slate-50"
+    class="overflow-hidden size-full text-slate-950 dark:from-zinc-800 dark:to-zinc-900 dark:text-slate-50"
   >
     <ModeWatcher />
     <Button
@@ -90,16 +66,10 @@
   </div>
 
   <!-- Toast Container -->
-  <Toaster position="top-right" />
+  <Toaster position="bottom-right" />
 {/if}
 
 <style>
-  #titlebar {
-    margin-right: env(titlebar-area-x);
-    width: env(titlebar-area-width);
-    height: env(titlebar-area-height);
-  }
-
   :global(html),
   :global(body) {
     margin: 0;

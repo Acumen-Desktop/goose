@@ -1,67 +1,95 @@
+/* postcss-preset-env stage 1 */
+/* @import "tailwindcss/base"; */
+/* @import "tailwindcss/components"; */
+/* @import "tailwindcss/utilities"; */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 72.2% 50.6%;
-    --destructive-foreground: 210 20% 98%;
-    --ring: 224 71.4% 4.1%;
+    /* Base colors using CSS color names and custom properties */
+    --color-white: #ffffff;
+    --color-black: #121212;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+    --color-purple: #7c3aed;
+    --color-purple-light: #8b5cf6;
+    --color-red: #ef4444;
+    --color-red-dark: #dc2626;
+
+    /* Theme variables - Light mode with increased contrast */
+    --background: var(--color-gray-50);
+    --foreground: var(--color-gray-900);
+    --muted: var(--color-gray-200);
+    --muted-foreground: var(--color-gray-600);
+    --popover: var(--color-white);
+    --popover-foreground: var(--color-gray-900);
+    --card: var(--color-white);
+    --card-foreground: var(--color-gray-800);
+    --border: var(--color-gray-300);
+    --input: var(--color-gray-300);
+    --primary: var(--color-purple);
+    --primary-foreground: var(--color-white);
+    --secondary: var(--color-gray-200);
+    --secondary-foreground: var(--color-gray-800);
+    --accent: var(--color-gray-100);
+    --accent-foreground: var(--color-gray-900);
+    --destructive: var(--color-red);
+    --destructive-foreground: var(--color-white);
+    --ring: var(--color-purple);
     --radius: 0.5rem;
-	--sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Sidebar specific colors - Light mode with increased contrast */
+    --sidebar-background: var(--color-gray-100);
+    --sidebar-foreground: var(--color-gray-700);
+    --sidebar-primary: var(--color-gray-900);
+    --sidebar-primary-foreground: var(--color-white);
+    --sidebar-accent: var(--color-gray-200);
+    --sidebar-accent-foreground: var(--color-gray-800);
+    --sidebar-border: var(--color-gray-300);
+    --sidebar-ring: var(--color-purple);
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --ring: 216 12.2% 83.9%;
-	--sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Dark theme overrides */
+    --background: var(--color-gray-900);
+    --foreground: var(--color-gray-100);
+    --muted: var(--color-gray-800);
+    --muted-foreground: var(--color-gray-400);
+    --popover: var(--color-gray-800);
+    --popover-foreground: var(--color-gray-100);
+    --card: var(--color-gray-800);
+    --card-foreground: var(--color-gray-100);
+    --border: var(--color-gray-700);
+    --input: var(--color-gray-700);
+    --primary: var(--color-purple-light);
+    --primary-foreground: var(--color-white);
+    --secondary: var(--color-gray-800);
+    --secondary-foreground: var(--color-gray-100);
+    --accent: var(--color-gray-800);
+    --accent-foreground: var(--color-gray-100);
+    --destructive: var(--color-red-dark);
+    --destructive-foreground: var(--color-gray-100);
+    --ring: var(--color-purple-light);
+
+    /* Dark sidebar overrides */
+    --sidebar-background: var(--color-gray-800);
+    --sidebar-foreground: var(--color-gray-300);
+    --sidebar-primary: var(--color-purple-light);
+    --sidebar-primary-foreground: var(--color-white);
+    --sidebar-accent: var(--color-gray-700);
+    --sidebar-accent-foreground: var(--color-gray-100);
+    --sidebar-border: var(--color-gray-700);
   }
 }
 
@@ -69,15 +97,70 @@
   * {
     @apply border-border;
   }
+
+  html,
   body {
     @apply bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
   }
 }
 
+/* Layout styles */
 body {
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-	width: 100vw;
-	height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+}
+
+/* Utility classes */
+.titlebar-drag-region {
+  -webkit-app-region: drag;
+  height: 32px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Spring animation variables */
+:root {
+  --spring-easing: linear(
+    0,
+    0.009,
+    0.035 2.1%,
+    0.141,
+    0.281 6.7%,
+    0.723 12.9%,
+    0.938 16.7%,
+    1.017,
+    1.077,
+    1.121,
+    1.149 24.3%,
+    1.159,
+    1.163,
+    1.161,
+    1.154 29.9%,
+    1.129 32.8%,
+    1.051 39.6%,
+    1.017 43.1%,
+    0.991,
+    0.977 51%,
+    0.974 53.8%,
+    0.975 57.1%,
+    0.997 69.8%,
+    1.003 76.9%,
+    1.004 83.8%,
+    1
+  );
+  --spring-duration: 1.333s;
 }
