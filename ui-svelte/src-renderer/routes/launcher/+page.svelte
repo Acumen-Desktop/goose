@@ -1,15 +1,25 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { GooseLogo } from "$lib/components/compound";
+  import GooseLogo from "$lib/components/compound/GooseLogo.svelte";
+  import { Input } from "$lib/components/shadcn-ui/input";
+  import type { HTMLInputAttributes } from "svelte/elements";
 
-  let query = "";
-  let isLoading = false;
+  let query = $state("");
+  let isLoading = $state(false);
+  let inputRef = $state<HTMLInputElement | null>(null);
 
-  async function handleSubmit() {
-    if (!query.trim()) return;
-    isLoading = true;
+  $effect(() => {
+    if (inputRef) {
+      inputRef.focus();
+    }
+  });
+
+  async function handleSubmit(event: Event) {
+    event.preventDefault();
+    if (!query.trim() || isLoading) return;
 
     try {
+      isLoading = true;
       // Create a new chat window with the query
       await window.electron.createChat(query);
       // Close the launcher window
@@ -26,43 +36,27 @@
       window.electron.closeLauncher();
     } else if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      void handleSubmit();
+      void handleSubmit(event);
     }
   }
 </script>
 
-<div class="flex items-center gap-2 p-2 bg-background text-foreground h-full">
-  <div class="flex-shrink-0">
-    <GooseLogo size="small" hover={false} />
-  </div>
-
-  <form class="flex-1" on:submit|preventDefault={handleSubmit}>
-    <input
+<div class="flex items-center gap-4 p-4 bg-background">
+  <GooseLogo class="w-8 h-8" />
+  <form class="flex-1" onsubmit={handleSubmit}>
+    <Input
       type="text"
+      class="flex-1"
+      placeholder="Type a message..."
       bind:value={query}
-      placeholder="Ask Goose..."
-      class="w-full bg-transparent border-none focus:outline-none text-lg"
-      on:keydown={handleKeydown}
+      bind:ref={inputRef}
       disabled={isLoading}
-      autofocus
+      onkeydown={handleKeydown}
     />
   </form>
-
-  {#if isLoading}
-    <div class="flex-shrink-0 w-6 h-6">
-      <GooseLogo size="small" />
-    </div>
-  {/if}
 </div>
 
 <style>
-  /* Remove default input styles */
-  input {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-  }
-
   /* Custom scrollbar for Webkit browsers */
   ::-webkit-scrollbar {
     width: 8px;

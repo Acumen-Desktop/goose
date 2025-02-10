@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import type { Message, ChatState } from "../../types/api";
+  import type { Message } from "../../types/chat";
   import { Button } from "$lib/components/shadcn-ui/button";
   import { Input } from "$lib/components/shadcn-ui/input";
   import { ScrollArea } from "$lib/components/shadcn-ui/scroll-area";
   import { Separator } from "$lib/components/shadcn-ui/separator";
-  import { ChatMessage } from "$lib/components/chat/ChatMessage.svelte";
-  import { WelcomeScreen } from "$lib/components/welcome/WelcomeScreen.svelte";
+  import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
+  import WelcomeScreen from "$lib/components/welcome/WelcomeScreen.svelte";
 
   // State
   let messages = $state<Message[]>([]);
@@ -97,7 +97,11 @@
     <ScrollArea class="flex-1 p-4">
       <div class="space-y-4">
         {#each messages as message (message.id)}
-          <ChatMessage {message} />
+          <ChatMessage
+            type={message.role === "assistant" ? "ai" : "user"}
+            content={message.content}
+            timestamp={new Date(message.timestamp)}
+          />
         {/each}
       </div>
 
@@ -116,12 +120,17 @@
           class="flex-1"
           placeholder="Type a message..."
           bind:value={inputMessage}
-          on:keydown={handleKeyDown}
           disabled={isWorking}
+          onkeydown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              void handleSend();
+            }
+          }}
         />
         <Button
-          on:click={handleSend}
           disabled={!inputMessage.trim() || isWorking}
+          onclick={() => void handleSend()}
         >
           Send
         </Button>

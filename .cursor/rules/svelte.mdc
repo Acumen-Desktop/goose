@@ -1,0 +1,9 @@
+---
+description: Use Svelte 5
+globs: 
+---
+Always use 'Svelte 5' and not your previous svelte training. 
+
+Read 'acumen/_goose/feature_docs/svelte5_svelteKit2/migration_notes.md' for each session
+
+Check your @Docs Svelte 5 when you get stuck

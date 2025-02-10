@@ -65,8 +65,8 @@
   {/each}
 </div>
 
-<style>
-  [data-selected="true"] {
+<style lang="postcss">
+  :global(.provider-card[data-selected="true"]) {
     @apply ring-2 ring-primary;
   }
 </style>

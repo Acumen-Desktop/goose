@@ -35,6 +35,8 @@ export interface ElectronAPI {
   fetchMetadata: (url: string) => Promise<any>;
   checkForOllama: () => Promise<boolean>;
   selectFileOrDirectory: () => Promise<string>;
+  createChat: (query?: string) => Promise<void>;
+  closeLauncher: () => void;
 }
 
 // Expose these types to the renderer process

@@ -1,0 +1,8 @@
+---
+description: Read the Typescript instructions file
+globs: 
+---
+
+[types_instructions.md](mdc:acumen/types_instructions.md)
+
+Read and update the typescript instructions file: 'acumen/types_instructions.md'.

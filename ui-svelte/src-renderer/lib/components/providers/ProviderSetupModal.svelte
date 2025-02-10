@@ -1,30 +1,40 @@
 <script lang="ts">
-  import { Dialog } from "$lib/components/shadcn-ui/dialog";
+  import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+  } from "$lib/components/shadcn-ui/dialog";
   import { Button } from "$lib/components/shadcn-ui/button";
   import { Input } from "$lib/components/shadcn-ui/input";
   import { Label } from "$lib/components/shadcn-ui/label";
-  import { required_keys } from "$lib/config/providers";
+  import { required_keys, type Provider } from "$lib/config/providers";
 
   let {
-    provider,
-    model,
-    endpoint,
-    onSubmit = (values: { [key: string]: string }) => {},
+    provider = undefined,
+    model = "",
+    endpoint = "",
+    onSubmit = (values: Record<string, string>) => {},
     onCancel = () => {},
   } = $props<{
-    provider?: string;
+    provider?: Provider;
     model?: string;
     endpoint?: string;
-    onSubmit?: (values: { [key: string]: string }) => void;
+    onSubmit?: (values: Record<string, string>) => void;
     onCancel?: () => void;
   }>();
 
-  let configValues = $state<{ [key: string]: string }>({});
+  let configValues = $state<Record<string, string>>({});
 
   $effect(() => {
     if (provider) {
-      const keys = required_keys[provider] || [];
-      configValues = keys.reduce((acc, key) => ({ ...acc, [key]: "" }), {});
+      const providerKeys = required_keys[provider as Provider] as string[];
+      configValues = providerKeys.reduce<Record<string, string>>(
+        (acc: Record<string, string>, key: string) => ({ ...acc, [key]: "" }),
+        {}
+      );
     }
   });
 
@@ -33,20 +43,20 @@
   }
 </script>
 
-<Dialog.Root open={true}>
-  <Dialog.Content class="sm:max-w-[425px]">
-    <Dialog.Header>
-      <Dialog.Title>Configure {provider}</Dialog.Title>
-      <Dialog.Description>
+<Dialog open={true}>
+  <DialogContent class="sm:max-w-[425px]">
+    <DialogHeader>
+      <DialogTitle>Configure {provider}</DialogTitle>
+      <DialogDescription>
         Enter your API keys to start using {provider}.
-      </Dialog.Description>
-    </Dialog.Header>
+      </DialogDescription>
+    </DialogHeader>
 
     <div class="grid gap-4 py-4">
-      {#if provider && required_keys[provider]}
-        {#each required_keys[provider] as key}
+      {#if provider && (required_keys[provider as Provider] as string[])}
+        {#each required_keys[provider as Provider] as key}
           <div class="grid grid-cols-4 items-center gap-4">
-            <Label class="text-right" for={key}>{key}</Label>
+            <Label for={key} class="text-right">{key}</Label>
             <Input
               id={key}
               type="password"
@@ -58,9 +68,9 @@
       {/if}
     </div>
 
-    <Dialog.Footer>
+    <DialogFooter>
       <Button variant="outline" onclick={onCancel}>Cancel</Button>
       <Button onclick={handleSubmit}>Save</Button>
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>

@@ -10,6 +10,8 @@ export interface Settings {
 }
 
 export interface AppConfigAPI {
+  getAll: () => any;
+  get: (key: string) => string | undefined;
   getConfig: () => Promise<Settings>;
   setConfig: (settings: Settings) => Promise<void>;
   getEnv: () => Promise<EnvToggles>;

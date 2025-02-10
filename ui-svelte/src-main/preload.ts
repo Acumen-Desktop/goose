@@ -54,6 +54,8 @@ const electronAPI: ElectronAPI = {
   fetchMetadata: (url: string) => ipcRenderer.invoke("fetch-metadata", url),
   checkForOllama: () => ipcRenderer.invoke("check-ollama"),
   selectFileOrDirectory: () => ipcRenderer.invoke("select-file-or-directory"),
+  createChat: (query?: string) => ipcRenderer.invoke("create-chat", query),
+  closeLauncher: () => ipcRenderer.send("close-launcher"),
 };
 
 // Expose the APIs
@@ -62,6 +64,10 @@ contextBridge.exposeInMainWorld("electron", electronAPI);
 // AppConfig API for compatibility
 const appConfigAPI = {
   getAll: () => config,
+  get: (key: string) => config[key],
+  getConfig: () => Promise.resolve(config),
+  setConfig: (settings: any) => Promise.resolve(),
+  getEnv: () => Promise.resolve({}),
 };
 contextBridge.exposeInMainWorld("appConfig", appConfigAPI);
 
