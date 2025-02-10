@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button } from "$lib/components/shadcn-ui/button";
+  import { Button } from "$lib/components/ui-shadcn/button";
   import { createEventDispatcher } from "svelte";
   import type { ChatInputProps } from "$lib/types/components";
 

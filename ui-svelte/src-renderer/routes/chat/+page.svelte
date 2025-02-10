@@ -2,12 +2,12 @@
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import type { Message } from "../../types/chat";
-  import { Button } from "$lib/components/shadcn-ui/button";
-  import { Input } from "$lib/components/shadcn-ui/input";
-  import { ScrollArea } from "$lib/components/shadcn-ui/scroll-area";
-  import { Separator } from "$lib/components/shadcn-ui/separator";
+  import { Button } from "$lib/components/ui-shadcn/button";
+  import { Input } from "$lib/components/ui-shadcn/input";
+  import { ScrollArea } from "$lib/components/ui-shadcn/scroll-area";
+  import { Separator } from "$lib/components/ui-shadcn/separator";
   import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-  import WelcomeScreen from "$lib/components/welcome/WelcomeScreen.svelte";
+  import WelcomeScreen from "../../../../_OLD/welcome/WelcomeScreen.svelte";
 
   // State
   let messages = $state<Message[]>([]);

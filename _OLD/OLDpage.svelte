@@ -2,9 +2,9 @@
   import { onMount } from "svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
-  import GooseLogo from "$lib/components/compound/GooseLogo.svelte";
-  import { Button } from "$lib/components/shadcn-ui/button";
-  import { Progress } from "$lib/components/shadcn-ui/progress";
+  import GooseLogo from "$lib/components/ui-compound/GooseLogo.svelte";
+  import { Button } from "$lib/components/ui-shadcn/button";
+  import { Progress } from "$lib/components/ui-shadcn/progress";
 
   let initialQuery = $page.url.searchParams.get("initialQuery") || "";
   let isLoading = true;

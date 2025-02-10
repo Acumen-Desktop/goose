@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button } from "$lib/components/shadcn-ui/button";
-  import { Card } from "$lib/components/shadcn-ui/card";
+  import { Button } from "$lib/components/ui-shadcn/button";
+  import { Card } from "$lib/components/ui-shadcn/card";
 
   interface Provider {
     id: string;

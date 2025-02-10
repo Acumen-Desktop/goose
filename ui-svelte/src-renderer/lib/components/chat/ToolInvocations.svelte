@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Card } from "$lib/components/shadcn-ui/card";
+  import { Card } from "$lib/components/ui-shadcn/card";
 
   interface ToolInvocation {
     toolCallId: string;

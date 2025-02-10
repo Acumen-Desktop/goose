@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Button } from "$lib/components/shadcn-ui/button";
-  // import { toast } from "$lib/components/shadcn-ui/use-toast";
+  import { Button } from "$lib/components/ui-shadcn/button";
+  // import { toast } from "$lib/components/ui-shadcn/use-toast";
   import { Toaster, toast } from "svelte-sonner";
   import BaseProviderGrid from "$lib/components/providers/BaseProviderGrid.svelte";
   import ProviderSetupModal from "$lib/components/providers/ProviderSetupModal.svelte";

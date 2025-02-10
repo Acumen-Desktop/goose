@@ -32,7 +32,7 @@ ui-svelte/
 │       │   ├── basic-ui/     # Atomic components
 │       │   ├── compound/     # Reusable compound components
 │       │   ├── features/     # Complex feature components
-│       │   └── shadcn-ui/    # Shadcn components
+│       │   └── ui-shadcn/    # Shadcn components
 │       ├── stores/          # Svelte stores
 │       └── utils/           # Utility functions
 ```
@@ -41,7 +41,7 @@ ui-svelte/
 
 1. **Route Components** (`routes/`): Full pages/features
 2. **Feature Components** (`lib/components/features/`): Complex, business-logic heavy components
-3. **Compound Components** (`lib/components/compound/`): Reusable combinations of basic components
+3. **Compound Components** (`lib/components/ui-compound/`): Reusable combinations of basic components
 4. **Basic UI Components** (`lib/components/basic-ui/`): Atomic UI components
 
 ### Migration Status
@@ -58,7 +58,7 @@ ui-svelte/
 - React basic components: `ui/desktop/src/components/ui`
 - React compound components: `ui/desktop/src/components`
 - React Icons moved to: `ui-svelte/src-renderer/lib/assets/icons-svg` and converted to svg files.
-- Svelte 5 components: `ui-svelte/src-renderer/lib/components/shadcn-ui`
+- Svelte 5 components: `ui-svelte/src-renderer/lib/components/ui-shadcn`
 - Raw SVG icons moved to: `ui-svelte/src-renderer/lib/assets/icons-svg`
 
 ## SVG Conversion Process
@@ -143,7 +143,7 @@ Status:
 
   - Lessons:
     - Using shadcn-svelte's Card component instead
-    - No need to recreate as it's part of shadcn-ui
+    - No need to recreate as it's part of ui-shadcn
 
 - [❌] select-styles.ts
   - Status: Not a component, just styles

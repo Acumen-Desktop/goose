@@ -6,10 +6,10 @@
     DialogTitle,
     DialogDescription,
     DialogFooter,
-  } from "$lib/components/shadcn-ui/dialog";
-  import { Button } from "$lib/components/shadcn-ui/button";
-  import { Input } from "$lib/components/shadcn-ui/input";
-  import { Label } from "$lib/components/shadcn-ui/label";
+  } from "$lib/components/ui-shadcn/dialog";
+  import { Button } from "$lib/components/ui-shadcn/button";
+  import { Input } from "$lib/components/ui-shadcn/input";
+  import { Label } from "$lib/components/ui-shadcn/label";
   import { required_keys, type Provider } from "$lib/config/providers";
 
   let {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import GooseLogo from "$lib/components/compound/GooseLogo.svelte";
-  import { Input } from "$lib/components/shadcn-ui/input";
+  import GooseLogo from "$lib/components/ui-compound/GooseLogo.svelte";
+  import { Input } from "$lib/components/ui-shadcn/input";
   import type { HTMLInputAttributes } from "svelte/elements";
 
   let query = $state("");

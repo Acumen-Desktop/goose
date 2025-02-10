@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import GooseLogo from "$lib/components/compound/GooseLogo.svelte";
-  import { Button } from "$lib/components/shadcn-ui/button/index.js";
-  import { Progress } from "$lib/components/shadcn-ui/progress/index.js";
+  import GooseLogo from "$lib/components/ui-compound/GooseLogo.svelte";
+  import { Button } from "$lib/components/ui-shadcn/button/index.js";
+  import { Progress } from "$lib/components/ui-shadcn/progress/index.js";
 
   let isLoading = $state(true);
   let progress = $state(0);

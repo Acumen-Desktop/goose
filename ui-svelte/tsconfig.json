@@ -31,6 +31,7 @@
     "src-main/**/*",
     "src-native/**/*",
     "src-renderer/**/*",
-    "../_OLD/OLDpage.svelte"
+    "../_OLD/OLDpage.svelte",
+    "../_OLD/welcome"
   ]
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { Button } from "$lib/components/shadcn-ui/button";
+  import { Button } from "$lib/components/ui-shadcn/button";
   import { goto } from "$app/navigation";
 </script>
 

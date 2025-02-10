@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { ScrollArea } from "$lib/components/shadcn-ui/scroll-area";
-  import { Button } from "$lib/components/shadcn-ui/button";
-  import GooseLogo from "$lib/components/compound/GooseLogo.svelte";
+  import { ScrollArea } from "$lib/components/ui-shadcn/scroll-area";
+  import { Button } from "$lib/components/ui-shadcn/button";
+  import GooseLogo from "$lib/components/ui-compound/GooseLogo.svelte";
   import ProviderGrid from "./ProviderGrid.svelte";
 
   let onSubmit = () => {

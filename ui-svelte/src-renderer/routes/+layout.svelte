@@ -9,7 +9,7 @@
   import Sun from "lucide-svelte/icons/sun";
   import Moon from "lucide-svelte/icons/moon";
   import { toggleMode } from "mode-watcher";
-  import { Button } from "$lib/components/shadcn-ui/button/index.js";
+  import { Button } from "$lib/components/ui-shadcn/button/index.js";
 
   let { data, children }: { data: LayoutData; children: Snippet } = $props();
   let fatalError = $state<string | null>(null);
