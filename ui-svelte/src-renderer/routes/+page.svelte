@@ -1,169 +1,104 @@
 <script lang="ts">
-  import type { PageData } from "./$types";
-  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import GooseLogo from "$lib/components/compound/GooseLogo.svelte";
+  import { Button } from "$lib/components/shadcn-ui/button/index.js";
+  import { Progress } from "$lib/components/shadcn-ui/progress/index.js";
 
-  let { data }: { data: PageData } = $props();
-  let serverStatus = $state("Checking...");
-  let debugInfo = $state({
-    config: null as null | Record<string, any>,
-    startTime: new Date().toISOString(),
-    connectionAttempts: 0,
-    lastError: null as null | string,
-    lastResponse: null as null | unknown,
-    electronAvailable: false,
-    appConfigAvailable: false,
-  });
+  let isLoading = $state(true);
+  let progress = $state(0);
+  let serverStarted = $state(false);
+  let error = $state<string | null>(null);
 
-  async function checkServer() {
+  async function checkServerStatus() {
     try {
-      // First check if window.electron is available
-      debugInfo.electronAvailable =
-        typeof window.electron?.getConfig === "function";
-      debugInfo.appConfigAvailable =
-        typeof window.appConfig?.getAll === "function";
+      const config = window.electron.getConfig();
+      console.log("Server config:", config);
+      const port = config.GOOSE_PORT;
 
-      if (!debugInfo.electronAvailable && !debugInfo.appConfigAvailable) {
-        throw new Error(
-          "Neither Electron nor AppConfig APIs are available - waiting for initialization"
-        );
+      if (!port) {
+        console.error("No port found in config");
+        throw new Error("Server port not found in config");
       }
 
-      // Try both APIs for redundancy
-      const config = debugInfo.electronAvailable
-        ? window.electron.getConfig()
-        : window.appConfig.getAll();
-
-      debugInfo.config = config;
-      debugInfo.connectionAttempts++;
-
-      console.log("Checking server with config:", config);
-
-      if (!config.GOOSE_PORT) {
-        throw new Error("No port configured");
-      }
-
-      const response = await fetch(
-        `http://127.0.0.1:${config.GOOSE_PORT}/status`
-      );
-
-      const responseData = await response.json();
-      debugInfo.lastResponse = responseData;
-
+      console.log(`Checking server status at port ${port}`);
+      const response = await fetch(`http://127.0.0.1:${port}/status`);
       if (response.ok) {
-        serverStatus = "Connected to Goose server!";
-        console.log("Server connected successfully:", responseData);
-      } else {
-        serverStatus = "Server responded but status not OK";
-        console.warn("Server response not OK:", response.status, responseData);
+        console.log("Server responded successfully");
+        serverStarted = true;
+        return true;
       }
-    } catch (err) {
-      const error = err as Error;
-      console.error("Server connection error:", error);
-      serverStatus = `Failed to connect to server: ${error.message}`;
-      debugInfo.lastError = error.message;
+      console.log("Server response not OK:", response.status);
+    } catch (e) {
+      console.error("Server check failed:", e);
+      return false;
     }
+    return false;
   }
 
-  onMount(() => {
-    console.log("Component mounted, checking server...");
-    void checkServer();
+  async function waitForServer() {
+    let attempts = 0;
+    const maxAttempts = 20; // 10 seconds total (20 * 500ms)
 
-    // Retry every 5 seconds if not connected
-    const interval = setInterval(() => {
-      if (!serverStatus.includes("Connected")) {
-        window.logInfo(
-          `[Server] Attempting to reconnect... (Attempt ${debugInfo.connectionAttempts + 1})`
-        );
-        void checkServer();
+    while (attempts < maxAttempts) {
+      progress = (attempts / maxAttempts) * 100;
+
+      if (await checkServerStatus()) {
+        progress = 100;
+        return true;
       }
-    }, 5000);
 
-    return () => clearInterval(interval);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      attempts++;
+    }
+
+    error = "Server failed to start";
+    return false;
+  }
+
+  $effect(() => {
+    waitForServer().finally(() => {
+      isLoading = false;
+    });
   });
 </script>
 
-<div
-  class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-8"
->
-  <h1 class="text-4xl font-bold mb-4 text-gray-800 dark:text-white">
-    Goose AI
-  </h1>
-  <p class="text-lg text-gray-600 dark:text-gray-300 mb-4">
-    Welcome to the Svelte UI
-  </p>
-
-  <!-- Server Status -->
+<div class="flex flex-col h-screen bg-background text-foreground">
+  <!-- Titlebar -->
   <div
-    class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl mb-8"
+    id="titlebar"
+    class="h-8 bg-muted flex items-center justify-between px-4"
+    style="-webkit-app-region: drag"
   >
-    <p class="text-gray-700 dark:text-gray-200 text-xl font-semibold mb-2">
-      Server Status: <span
-        class={serverStatus.includes("Connected")
-          ? "text-green-500"
-          : "text-red-500"}>{serverStatus}</span
-      >
-    </p>
-  </div>
-
-  <!-- Debug Information -->
-  <div
-    class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl"
-  >
-    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-      Debug Information
-    </h2>
-
-    <div class="space-y-4 font-mono text-sm">
-      <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h3 class="text-gray-600 dark:text-gray-400">APIs Available</h3>
-        <p class="text-gray-800 dark:text-gray-200">
-          Electron API: {debugInfo.electronAvailable ? "Yes" : "No"}<br />
-          AppConfig API: {debugInfo.appConfigAvailable ? "Yes" : "No"}
-        </p>
-      </div>
-
-      <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h3 class="text-gray-600 dark:text-gray-400">Start Time</h3>
-        <p class="text-gray-800 dark:text-gray-200">{debugInfo.startTime}</p>
-      </div>
-
-      <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h3 class="text-gray-600 dark:text-gray-400">Connection Attempts</h3>
-        <p class="text-gray-800 dark:text-gray-200">
-          {debugInfo.connectionAttempts}
-        </p>
-      </div>
-
-      {#if debugInfo.config}
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-          <h3 class="text-gray-600 dark:text-gray-400">Configuration</h3>
-          <pre
-            class="text-gray-800 dark:text-gray-200 overflow-x-auto">{JSON.stringify(
-              debugInfo.config,
-              null,
-              2
-            )}</pre>
-        </div>
-      {/if}
-
-      {#if debugInfo.lastResponse}
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-          <h3 class="text-gray-600 dark:text-gray-400">Last Server Response</h3>
-          <pre
-            class="text-gray-800 dark:text-gray-200 overflow-x-auto">{JSON.stringify(
-              debugInfo.lastResponse,
-              null,
-              2
-            )}</pre>
-        </div>
-      {/if}
-
-      {#if debugInfo.lastError}
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-          <h3 class="text-gray-600 dark:text-gray-400">Last Error</h3>
-          <p class="text-red-500">{debugInfo.lastError}</p>
-        </div>
-      {/if}
+    <div class="flex items-center gap-2">
+      <GooseLogo size="small" hover={false} />
+      <span class="text-sm font-medium">Goose</span>
     </div>
   </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-hidden">
+    <div class="flex flex-col items-center justify-center h-full gap-8 p-8">
+      <div class="relative">
+        <GooseLogo size="default" class="w-32 h-32" />
+        {#if isLoading}
+          <div class="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
+            <Progress value={progress} class="w-48" />
+          </div>
+        {/if}
+      </div>
+
+      <div class="text-center space-y-4">
+        {#if error}
+          <p class="text-destructive">{error}</p>
+        {:else if isLoading}
+          <p class="text-muted-foreground">Starting Goose server...</p>
+        {:else if serverStarted}
+          <div class="space-y-2">
+            <p class="text-green-500">Server started successfully!</p>
+            <Button onclick={() => goto("/welcome")}>Continue</Button>
+          </div>
+        {/if}
+      </div>
+    </div>
+  </main>
 </div>

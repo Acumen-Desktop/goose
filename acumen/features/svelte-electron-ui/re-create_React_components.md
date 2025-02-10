@@ -1,4 +1,57 @@
-# Re-creating React UI Components in Svelte 5
+# Converting React UI to SvelteKit
+
+## Current Approach
+
+### Page-First Component Migration
+
+We're taking a page-first approach to converting the React UI to SvelteKit. This means:
+
+1. First, identify the main pages/routes in the React app
+2. Create corresponding SvelteKit routes
+3. Convert components as needed while building each route
+4. Test the functionality as we go
+
+### Current Focus
+
+- Converting the main chat interface from React to SvelteKit
+- Ensuring Electron integration works correctly
+- Maintaining feature parity while improving the architecture
+
+### Directory Structure
+
+```
+ui-svelte/
+├── src-main/              # Electron main process
+├── src-renderer/          # SvelteKit app
+│   ├── routes/           # SvelteKit routes (pages)
+│   │   ├── chat/        # Chat interface
+│   │   ├── settings/    # Settings pages
+│   │   └── +layout.svelte
+│   └── lib/
+│       ├── components/
+│       │   ├── basic-ui/     # Atomic components
+│       │   ├── compound/     # Reusable compound components
+│       │   ├── features/     # Complex feature components
+│       │   └── shadcn-ui/    # Shadcn components
+│       ├── stores/          # Svelte stores
+│       └── utils/           # Utility functions
+```
+
+### Component Categories
+
+1. **Route Components** (`routes/`): Full pages/features
+2. **Feature Components** (`lib/components/features/`): Complex, business-logic heavy components
+3. **Compound Components** (`lib/components/compound/`): Reusable combinations of basic components
+4. **Basic UI Components** (`lib/components/basic-ui/`): Atomic UI components
+
+### Migration Status
+
+- [✅] Project structure setup
+- [✅] Basic UI components converted
+- [⏳] Main chat interface
+- [❌] Settings pages
+- [❌] Extension system
+- [❌] Keyboard shortcuts
 
 ## Source Structure
 
@@ -10,18 +63,35 @@
 
 ## SVG Conversion Process
 
-When encountering React components that are just SVG wrappers:
+When converting React SVG components to Svelte:
 
-1. Create a new .svg file in `ui-svelte/src-renderer/lib/assets/icons-svg`
-2. Extract the SVG content from the React component
-3. For dynamic props (like size), use CSS variables in the SVG:
-   ```svg
-   <svg width="var(--size, 24)" height="var(--size, 24)" ...>
-   ```
-4. Use the `Icon` component to render with props:
+1. Create raw SVG files in `ui-svelte/src-renderer/lib/assets/icons-svg/`
+2. Import SVGs directly in Svelte components:
+
    ```svelte
-   <Icon name="icon-name" style="--size: {size}px" />
+   <script lang="ts">
+     import icon from "$lib/assets/icons-svg/icon.svg";
+   </script>
+
+   <img src={icon} alt="Icon description" />
    ```
+
+3. For dynamic styling, use CSS classes or style props on the `<img>` tag
+4. For hover effects, use Svelte's class directives:
+   ```svelte
+   <img
+     src={icon}
+     class="{hover ? 'opacity-0 group-hover:opacity-100' : ''}"
+   />
+   ```
+
+### Benefits of This Approach
+
+- Better type safety with direct imports
+- Vite handles asset optimization
+- Simpler than using inline SVGs
+- Works well with Svelte 5's new props syntax
+- Easier to maintain and update SVG assets
 
 ## React Components List
 

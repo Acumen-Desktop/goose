@@ -27,8 +27,8 @@ import { startGoosed } from "./goosed";
 import log from "./utils/logger";
 import { loadRecentDirs } from "./utils/recentDirs";
 
-import type { WindowType, IpcEvents } from './types/ipc';
-import type { GooseProcess, GooseResult } from './types/process';
+import type { WindowType, IpcEvents } from "./types/ipc";
+import type { GooseProcess, GooseResult } from "./types/process";
 
 // Prevent multiple instances
 if (!app.requestSingleInstanceLock() || electronSquirrelStartup) {
@@ -100,7 +100,9 @@ async function createLauncher(): Promise<void> {
     transparent: false,
     webPreferences: {
       preload: path.join(app.getAppPath(), ".vite/main/preload.cjs"),
-      additionalArguments: [JSON.stringify({ type: "launcher" } satisfies WindowType)],
+      additionalArguments: [
+        JSON.stringify({ type: "launcher" } satisfies WindowType),
+      ],
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
@@ -131,18 +133,22 @@ async function createLauncher(): Promise<void> {
   });
 }
 
-async function createChat(query?: string, dir?: string, version?: string): Promise<BrowserWindow> {
+async function createChat(
+  query?: string,
+  dir?: string,
+  version?: string
+): Promise<BrowserWindow> {
   try {
     const [port, working_dir] = await startGoosed(app, dir);
-    log.info(`Goose server started on port ${port} in directory ${working_dir}`);
+    log.info(
+      `Goose server started on port ${port} in directory ${working_dir}`
+    );
 
     const mainWindow = new BrowserWindow({
-      titleBarStyle: "hidden",
-      trafficLightPosition: { x: 16, y: 10 },
-      vibrancy: "window",
-      width: 750,
-      height: 800,
-      minWidth: 650,
+      x: 2048,
+      y: 0,
+      width: 1800,
+      height: 1000,
       backgroundColor: "#374151",
       icon: path.join(staticAssetsFolder, "icon.png"),
       webPreferences: {
@@ -172,7 +178,9 @@ async function createChat(query?: string, dir?: string, version?: string): Promi
     const xOffset = direction * initialOffset * Math.floor(windowCounter / 2);
     mainWindow.setPosition(baseXPosition + xOffset, 100);
 
-    const queryParam = query ? `?initialQuery=${encodeURIComponent(query)}` : "";
+    const queryParam = query
+      ? `?initialQuery=${encodeURIComponent(query)}`
+      : "";
     if (import.meta.env.DEV) {
       await mainWindow.loadURL(
         `${VITE_DEV_SERVER_URLS["main_window"]}${queryParam}`
@@ -188,9 +196,12 @@ async function createChat(query?: string, dir?: string, version?: string): Promi
       }
     });
 
-    mainWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription) => {
-      log.error("Window failed to load:", errorCode, errorDescription);
-    });
+    mainWindow.webContents.on(
+      "did-fail-load",
+      (event, errorCode, errorDescription) => {
+        log.error("Window failed to load:", errorCode, errorDescription);
+      }
+    );
 
     mainWindow.webContents.on("console-message", (event, level, message) => {
       log.info("Renderer Console:", message);
@@ -249,22 +260,22 @@ app.whenReady().then(async () => {
   globalShortcut.register("Control+Alt+Command+G", createLauncher);
 
   // Type-safe IPC event handlers
-  ipcMain.on('create-chat-window', ((_, query, dir, version) => {
+  ipcMain.on("create-chat-window", ((_, query, dir, version) => {
     createChat(query, dir, version);
-  }) as IpcEvents['create-chat-window']);
+  }) as IpcEvents["create-chat-window"]);
 
-  ipcMain.on('directory-chooser', ((_, replace = false) => {
+  ipcMain.on("directory-chooser", ((_, replace = false) => {
     // TODO: Implement directory chooser
-  }) as IpcEvents['directory-chooser']);
+  }) as IpcEvents["directory-chooser"]);
 
-  ipcMain.on('logInfo', ((_, info) => {
+  ipcMain.on("logInfo", ((_, info) => {
     log.info("from renderer:", info);
-  }) as IpcEvents['logInfo']);
+  }) as IpcEvents["logInfo"]);
 
-  ipcMain.on('reload-app', (() => {
+  ipcMain.on("reload-app", (() => {
     app.relaunch();
     app.exit(0);
-  }) as IpcEvents['reload-app']);
+  }) as IpcEvents["reload-app"]);
 });
 
 // Window management
@@ -281,8 +292,9 @@ app.on("activate", () => {
 });
 
 // IPC handlers
-ipcMain.on('toggleDevTools', ((event) => event.sender.toggleDevTools()) as IpcEvents['toggleDevTools']);
-ipcMain.on('setTitleBarColors', ((event, bgColor, iconColor) => {
+ipcMain.on("toggleDevTools", ((event) =>
+  event.sender.toggleDevTools()) as IpcEvents["toggleDevTools"]);
+ipcMain.on("setTitleBarColors", ((event, bgColor, iconColor) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   if (!window?.setTitleBarOverlay) return;
 
@@ -291,4 +303,4 @@ ipcMain.on('setTitleBarColors', ((event, bgColor, iconColor) => {
     symbolColor: iconColor,
     height: 40,
   });
-}) as IpcEvents['setTitleBarColors']);
+}) as IpcEvents["setTitleBarColors"]);

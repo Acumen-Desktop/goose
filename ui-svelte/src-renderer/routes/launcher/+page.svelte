@@ -1,68 +1,56 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
+  import { GooseLogo } from "$lib/components/compound";
 
-  let command = $state("");
-  let recentDirs = $state<string[]>([]);
-
-  onMount(async () => {
-    // Load recent directories
-    const config = window.electron.getConfig();
-    recentDirs = config.recentDirs || [];
-  });
+  let query = "";
+  let isLoading = false;
 
   async function handleSubmit() {
-    if (!command.trim()) return;
+    if (!query.trim()) return;
+    isLoading = true;
 
-    // Check if it's a directory path
-    if (command.startsWith("/") || command.startsWith("./")) {
-      window.electron.directoryChooser(command);
-      return;
+    try {
+      // Create a new chat window with the query
+      await window.electron.createChat(query);
+      // Close the launcher window
+      window.electron.closeLauncher();
+    } catch (error) {
+      console.error("Failed to create chat:", error);
+      isLoading = false;
     }
-
-    // Create new chat window with command
-    window.electron.createChatWindow(command);
   }
 
-  function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === "Enter" && !event.shiftKey) {
+  // Handle keyboard shortcuts
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === "Escape") {
+      window.electron.closeLauncher();
+    } else if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       void handleSubmit();
-    } else if (event.key === "Escape") {
-      window.electron.hideWindow();
     }
   }
 </script>
 
-<div
-  class="w-full h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
->
-  <div class="p-2">
-    <input
-      type="text"
-      class="w-full px-3 py-2 text-sm bg-transparent border-none outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500"
-      placeholder="Type a command or directory path..."
-      bind:value={command}
-      on:keydown={handleKeyDown}
-      autofocus
-    />
+<div class="flex items-center gap-2 p-2 bg-background text-foreground h-full">
+  <div class="flex-shrink-0">
+    <GooseLogo size="small" hover={false} />
   </div>
 
-  {#if recentDirs.length > 0 && !command}
-    <div class="px-2 pb-2">
-      <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-        Recent Directories
-      </div>
-      {#each recentDirs as dir}
-        <button
-          class="w-full text-left px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-          on:click={() => {
-            window.electron.createChatWindow(undefined, dir);
-          }}
-        >
-          {dir}
-        </button>
-      {/each}
+  <form class="flex-1" on:submit|preventDefault={handleSubmit}>
+    <input
+      type="text"
+      bind:value={query}
+      placeholder="Ask Goose..."
+      class="w-full bg-transparent border-none focus:outline-none text-lg"
+      on:keydown={handleKeydown}
+      disabled={isLoading}
+      autofocus
+    />
+  </form>
+
+  {#if isLoading}
+    <div class="flex-shrink-0 w-6 h-6">
+      <GooseLogo size="small" />
     </div>
   {/if}
 </div>
