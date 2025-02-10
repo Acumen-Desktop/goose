@@ -52,3 +52,6 @@ ui-svelte/.env.local
 ui-svelte/.env.development.local
 ui-svelte/.env.test.local
 ui-svelte/.env.production.local
+
+env.ts
+ui-svelte/src-main/lib/env.ts
