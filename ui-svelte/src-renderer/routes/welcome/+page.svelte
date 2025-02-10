@@ -65,6 +65,14 @@
             >
               Quick Start Guide
             </Button>
+            <!-- 
+            onclick={() =>
+                window.open(
+                  "https://block.github.io/goose/docs/quickstart",
+                  "_blank"
+                )}
+            
+            -->
           </p>
         </div>
       </div>

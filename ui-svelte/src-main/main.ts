@@ -18,6 +18,7 @@ import {
   Menu,
   globalShortcut,
   screen,
+  shell,
 } from "electron";
 import path from "path";
 import url from "url";
@@ -304,3 +305,10 @@ ipcMain.on("setTitleBarColors", ((event, bgColor, iconColor) => {
     height: 40,
   });
 }) as IpcEvents["setTitleBarColors"]);
+
+// Add handler for opening URLs in default browser
+ipcMain.on("open-in-chrome", (_, url) => {
+  shell.openExternal(url).catch((err) => {
+    log.error("Failed to open URL in browser:", err);
+  });
+});
