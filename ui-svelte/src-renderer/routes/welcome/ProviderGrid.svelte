@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { Button } from "$lib/components/shadcn-ui/button";
-  import { toast } from "$lib/components/shadcn-ui/use-toast";
+  // import { toast } from "$lib/components/shadcn-ui/use-toast";
+  import { Toaster, toast } from "svelte-sonner";
   import BaseProviderGrid from "$lib/components/providers/BaseProviderGrid.svelte";
   import ProviderSetupModal from "$lib/components/providers/ProviderSetupModal.svelte";
   import {
@@ -50,22 +51,21 @@
     }));
   }
 
-  async function handleConfigure(provider) {
+  async function handleConfigure(provider: { id: string; name: string }) {
     const providerId = provider.id.toLowerCase();
     const modelName = getDefaultModel(providerId);
 
     await initializeSystem(providerId, modelName);
     localStorage.setItem("GOOSE_PROVIDER", providerId);
 
-    toast({
-      title: "Provider Selected",
+    toast.success("Provider Selected", {
       description: `Selected ${provider.name} provider. Starting Goose with default model: ${modelName}.`,
     });
 
     onSubmit?.();
   }
 
-  function handleAddKeys(provider) {
+  function handleAddKeys(provider: { id: string }) {
     selectedId = provider.id;
     showSetupModal = true;
   }
@@ -137,8 +137,7 @@
         }
       }
 
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: isUpdate
           ? `Successfully updated configuration for ${provider}`
           : `Successfully added configuration for ${provider}`,
@@ -152,10 +151,8 @@
       selectedId = null;
     } catch (error) {
       console.error("Error handling modal submit:", error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: `Failed to ${providers.find((p) => p.id === selectedId)?.isConfigured ? "update" : "add"} configuration for ${provider}`,
-        variant: "destructive",
       });
     }
   }
@@ -202,4 +199,6 @@
       />
     </div>
   {/if}
+
+  <Toaster />
 </div>
