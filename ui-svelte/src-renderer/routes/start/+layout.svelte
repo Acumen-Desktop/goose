@@ -1,6 +1,6 @@
 <script lang="ts">
   import "$lib/styles/app.css";
-  import Devtools from "$lib/components/Devtools.svelte";
+  import Devtools from "$lib/components/ui-basic/Devtools.svelte";
   import { preferredTheme } from "$lib/preferredTheme.svelte";
 
   let { children } = $props();
