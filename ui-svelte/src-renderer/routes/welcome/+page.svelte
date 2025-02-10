@@ -3,6 +3,8 @@
   import { Button } from "$lib/components/ui-shadcn/button";
   import GooseLogo from "$lib/components/ui-compound/GooseLogo.svelte";
   import ProviderGrid from "./ProviderGrid.svelte";
+  import { goto } from "$app/navigation";
+  import { ArrowLeft } from "lucide-svelte";
 
   let onSubmit = () => {
     // Will be implemented when we add the provider grid
@@ -10,6 +12,11 @@
 </script>
 
 <div class="size-full select-none bg-background flex flex-col">
+  <div class="back-button">
+    <Button variant="ghost" onclick={() => goto("/")} aria-label="Back to Home">
+      <ArrowLeft size={24} />
+    </Button>
+  </div>
   <!-- Fixed Header -->
   <header class="flex-none px-8 py-6 md:px-16 border-b">
     <div class="flex items-center gap-4 max-w-4xl mx-auto">
@@ -72,3 +79,12 @@
     </div>
   </footer>
 </div>
+
+<style>
+  .back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+  }
+</style>

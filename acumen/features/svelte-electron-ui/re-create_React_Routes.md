@@ -30,18 +30,19 @@ src/routes/
 
 # Terminal Commands
 Run these commands to create the SvelteKit route structure (you can copy/paste all lines at once):
+
 ```bash
-mkdir -p src/routes/chat/[id]
-touch src/routes/chat/[id]/+page.svelte
-mkdir -p src/routes/settings
-touch src/routes/settings/+page.svelte
-mkdir -p src/routes/settings/more-models
-touch src/routes/settings/more-models/+page.svelte
-mkdir -p src/routes/settings/configure-providers
-touch src/routes/settings/configure-providers/+page.svelte
-mkdir -p src/routes/welcome
-touch src/routes/welcome/+page.svelte
-touch src/routes/+layout.svelte
+mkdir -p ui-svelte/src-renderer/routes/chat/[id]
+touch ui-svelte/src-renderer/routes/chat/[id]/+page.svelte
+mkdir -p ui-svelte/src-renderer/routes/settings
+touch ui-svelte/src-renderer/routes/settings/+page.svelte
+mkdir -p ui-svelte/src-renderer/routes/settings/more-models
+touch ui-svelte/src-renderer/routes/settings/more-models/+page.svelte
+mkdir -p ui-svelte/src-renderer/routes/settings/configure-providers
+touch ui-svelte/src-renderer/routes/settings/configure-providers/+page.svelte
+mkdir -p ui-svelte/src-renderer/routes/welcome
+touch ui-svelte/src-renderer/routes/welcome/+page.svelte
+touch ui-svelte/src-renderer/routes/+layout.svelte
 ```
 
 Note: The root layout file (+layout.svelte) will handle the fallback redirect to '/chat/1' for unmatched routes.
