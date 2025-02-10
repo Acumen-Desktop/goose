@@ -170,15 +170,6 @@ async function createChat(
       },
     });
 
-    const primaryDisplay = screen.getPrimaryDisplay();
-    const { width } = primaryDisplay.workAreaSize;
-    windowCounter++;
-    const direction = windowCounter % 2 === 0 ? 1 : -1;
-    const initialOffset = 50;
-    const baseXPosition = Math.round(width / 2 - mainWindow.getSize()[0] / 2);
-    const xOffset = direction * initialOffset * Math.floor(windowCounter / 2);
-    mainWindow.setPosition(baseXPosition + xOffset, 100);
-
     const queryParam = query
       ? `?initialQuery=${encodeURIComponent(query)}`
       : "";
