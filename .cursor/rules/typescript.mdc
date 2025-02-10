@@ -1,0 +1,30 @@
+---
+description: Read the Typescript instructions file
+globs: 
+---
+
+[types_instructions.md](mdc:acumen/types_instructions.md)
+
+Read and update the typescript instructions file: 'acumen/types_instructions.md'.
+
+# TypeScript Rules
+
+1. Types MUST be in `.d.ts` files following the structure:
+
+   ```
+   ui-svelte/
+   ├── src-main/types/
+   │   ├── electron.d.ts       # IPC & Window API
+   │   ├── ipc.d.ts           # IPC Events & Payloads
+   │   └── config.d.ts        # App & Env Config
+   ├── src-renderer/
+       ├── app.d.ts           # Global & Window
+       └── types/             # Shared Types
+   ```
+
+2. NO type duplication across processes
+3. Use `import type` statements
+4. Component types stay with components
+5. Prefer interfaces over type aliases
+6. Use strict TypeScript config
+7. Use barrel exports in index.d.ts files

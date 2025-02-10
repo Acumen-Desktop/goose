@@ -1,0 +1,32 @@
+---
+description: Basic codebase instructions
+globs: 
+---
+# Codebase Rules
+
+1. ALWAYS check existing files before creating new ones:
+
+   - Search in the codebase for similar functionality
+   - Check recently viewed files
+   - Use grep/semantic search to find related code
+
+2. Framework & Architecture:
+
+   - This is an Electron app, NOT Tauri
+   - Use ESM modules with .mts extension
+   - Follow functional programming patterns
+   - Use the existing package manager (check package.json)
+
+3. File Organization:
+
+   - Check ui-svelte/src-main/ for main process code
+   - Check ui-svelte/src-renderer/ for renderer process code
+   - Respect the existing file structure
+   - Don't duplicate functionality
+
+4. Before Making Changes:
+   - Read the TypeScript organization guide
+   - Check for existing implementations
+   - Verify the tech stack being used
+   - Follow existing patterns in the codebase
+

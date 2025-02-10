@@ -16,3 +16,13 @@ export interface AppConfigAPI {
   setConfig: (settings: Settings) => Promise<void>;
   getEnv: () => Promise<EnvToggles>;
 }
+
+// Provider types
+export type Provider = "openai" | "anthropic" | "azure" | "google" | "mistral";
+
+export interface ProviderConfig {
+  provider: Provider;
+  apiKey: string;
+  model?: string;
+  options?: Record<string, unknown>;
+}
