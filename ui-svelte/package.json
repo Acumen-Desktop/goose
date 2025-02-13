@@ -12,8 +12,7 @@
 		"publish": "tsx node_modules/@electron-forge/cli/src/electron-forge-publish",
 		"svelte-dev": "vite -c ./vite.renderer.config.ts",
 		"svelte-build": "vite build -c ./vite.renderer.config.ts",
-		"svelte-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"svelte-check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"svelte-check": "svelte-kit sync && svelte-check --workspace ./ui-svelte",
 		"test": "vitest"
 	},
 	"devDependencies": {
@@ -42,7 +41,7 @@
 		"paneforge": "^1.0.0-next.2",
 		"postcss": "^8.4.41",
 		"svelte": "^5.0.0",
-		"svelte-check": "^4.0.0",
+		"svelte-check": "^4.1.4",
 		"svelte-sonner": "^0.3.28",
 		"sveltekit-superforms": "^2.23.1",
 		"tailwind-merge": "^3.0.1",
@@ -63,8 +62,12 @@
 	},
 	"license": "MIT",
 	"dependencies": {
+		"@ai-sdk/openai": "^1.1.11",
+		"@ai-sdk/svelte": "^1.1.15",
 		"@tanstack/table-core": "^8.20.5",
+		"ai": "^4.1.38",
 		"electron-log": "^5.3.0",
-		"electron-squirrel-startup": "^1.0.1"
+		"electron-squirrel-startup": "^1.0.1",
+		"openai": "^4.52.6"
 	}
 }

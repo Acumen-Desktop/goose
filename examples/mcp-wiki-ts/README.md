@@ -2,6 +2,19 @@
 
 This is a TypeScript implementation of the MCP Wiki example that provides a tool for reading Wikipedia articles and converting them to Markdown format.
 
+Run this with:
+```bash
+# Development mode
+yarn test:dev
+# or
+npx @modelcontextprotocol/inspector tsx src/server.ts
+
+# Production mode
+yarn test:prod
+# or
+yarn build && npx @modelcontextprotocol/inspector node dist/server.bundle.js
+```
+
 ## Features
 
 - Fetches Wikipedia articles from provided URLs
@@ -17,17 +30,31 @@ This is a TypeScript implementation of the MCP Wiki example that provides a tool
    yarn
    ```
 
-## Running the Server
+## Development
 
 Start the server in development mode with auto-reload:
 ```bash
 yarn dev
 ```
 
-Or run the production build:
+## Production Build
+
+Build and run the production version:
 ```bash
 yarn build
 yarn start
+```
+
+## Testing
+
+Test in development mode:
+```bash
+yarn test:dev
+```
+
+Test the production build:
+```bash
+yarn test:prod
 ```
 
 ## Usage

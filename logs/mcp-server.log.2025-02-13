@@ -63,3 +63,6 @@
 
 [2m2025-02-13T18:13:14.678628Z[0m [32m INFO[0m ThreadId(01) [1mmessage_processing[0m[2m:[0m [2mcrates/mcp-server/src/lib.rs[0m[2m:[0m[2m155:[0m Received request [3mrequest_id[0m[2m=[0mSome(14) [3mmethod[0m[2m=[0m"resources/read" [3mjson[0m[2m=[0m{"jsonrpc":"2.0","id":14,"method":"resources/read","params":{"uri":"memo://insights"}}
 [2m2025-02-13T18:13:14.678694Z[0m [32m INFO[0m ThreadId(01) [1mmessage_processing[0m[2m:[0m [2mcrates/mcp-server/src/lib.rs[0m[2m:[0m[2m185:[0m Sending response [3mresponse_id[0m[2m=[0mSome(14) [3mjson[0m[2m=[0m{"jsonrpc":"2.0","id":14,"result":{"contents":[{"mime_type":"text/plain","text":"Business Intelligence Memo\n\nAnalysis has revealed 5 key insights ...","uri":"memo://insights"}]}}
+[2m2025-02-13T18:21:24.259558Z[0m [32m INFO[0m ThreadId(01) [2mcrates/mcp-server/src/main.rs[0m[2m:[0m[2m173:[0m Starting MCP server
+[2m2025-02-13T18:21:24.259652Z[0m [32m INFO[0m ThreadId(01) [2mcrates/mcp-server/src/main.rs[0m[2m:[0m[2m182:[0m Server initialized and ready to handle requests
+[2m2025-02-13T18:21:24.259676Z[0m [32m INFO[0m ThreadId(01) [2mcrates/mcp-server/src/lib.rs[0m[2m:[0m[2m143:[0m Server started

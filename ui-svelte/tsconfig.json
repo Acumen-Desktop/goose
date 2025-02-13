@@ -21,17 +21,9 @@
     ".svelte-kit/ambient.d.ts",
     ".svelte-kit/non-ambient.d.ts",
     ".svelte-kit/types/**/$types.d.ts",
-    // "src/**/*.js",
-    // "src/**/*.ts",
-    // "src/**/*.svelte",
-    // "tests/**/*.js",
-    // "tests/**/*.ts",
-    // "tests/**/*.svelte",
     "forge.env.d.ts",
     "src-main/**/*",
     "src-native/**/*",
     "src-renderer/**/*",
-    "../_OLD/OLDpage.svelte",
-    "../_OLD/welcome"
-  ]
+  ],
 }
