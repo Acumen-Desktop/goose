@@ -11,6 +11,7 @@ use url::Url;
 use uuid::Uuid;
 
 const DEFAULT_LANGFUSE_URL: &str = "http://localhost:3000";
+// const DEFAULT_LANGFUSE_URL: &str = "https://us.cloud.langfuse.com";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct LangfuseIngestionResponse {
